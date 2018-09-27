@@ -42,9 +42,10 @@ namespace {
         }
       }
 
-      errs() << memAccsInstCnt << " memory access instructions" << "\n";
-      errs() << branchInstCnt << " branch and indirect branch instructions" << "\n";
-      errs() << arithmInstCnt << " arithmetic instructions" << "\n";
+      errs() << F.getName() << " contains: \n" 
+      errs() << "\t" << memAccsInstCnt << " memory access instructions" << "\n";
+      errs() << "\t" << branchInstCnt << " branch and indirect branch instructions" << "\n";
+      errs() << "\t" << arithmInstCnt << " arithmetic instructions" << "\n";
 
       return false;
     }
