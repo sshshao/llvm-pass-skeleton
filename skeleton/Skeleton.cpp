@@ -20,29 +20,32 @@ namespace {
 
       for (auto &B : F) {
         for (auto &I : B) {
-          if(auto *op = dyn_cast<LoadInst>(&I) || 
-              auto *op = dyn_cast<StoreInst>(&I) || 
-              auto *op = dyn_cast<AtomicCmpXchgInst>(&I) || 
-              auto *op = dyn_cast<AtomicRMWInst>(&I)) {
+          if(dyn_cast<LoadInst>(&I) || 
+              dyn_cast<StoreInst>(&I) || 
+              dyn_cast<AllocaInst>(&I) ||
+              dyn_cast<AtomicCmpXchgInst>(&I) || 
+              dyn_cast<AtomicRMWInst>(&I) || 
+              dyn_cast<FenceInst>(&I) ||
+              dyn_cast<GetElementPtrInst>(&I)) {
             memAccsInstCnt++;
           }
 
-          if(auto *op = dyn_cast<BranchInst>(&I) || auto *op = dyn_cast<IndirectBrInst>(&I)) {
+          if(dyn_cast<BranchInst>(&I) || dyn_cast<IndirectBrInst>(&I)) {
             branchInstCnt++;
           }
 
-          if(auto *op = dyn_cast<BinaryOperator>(&I)) {
-            if(op.getOpcode() == Instruction::Add ||
-                op.getOpcode() == Instruction::Sub ||
-                op.getOpcode() == Instruction::Mul ||
-                op.getOpcode() == Instruction::Shl) {
+          if(dyn_cast<BinaryOperator>(&I)) {
+            if(op->getOpcode() == Instruction::Add ||
+                op->getOpcode() == Instruction::Sub ||
+                op->getOpcode() == Instruction::Mul ||
+                op->getOpcode() == Instruction::Shl) {
               arithmInstCnt++;
             } 
           }
         }
       }
 
-      errs() << F.getName() << " contains: \n" 
+      errs() << F.getName() << " contains: \n"; 
       errs() << "\t" << memAccsInstCnt << " memory access instructions" << "\n";
       errs() << "\t" << branchInstCnt << " branch and indirect branch instructions" << "\n";
       errs() << "\t" << arithmInstCnt << " arithmetic instructions" << "\n";
