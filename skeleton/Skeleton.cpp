@@ -14,29 +14,37 @@ namespace {
     SkeletonPass() : FunctionPass(ID) {}
 
     virtual bool runOnFunction(Function &F) {
+      int memAccsInstCnt = 0;
+      int branchInstCnt = 0;
+      int arithmInstCnt = 0;
+
       for (auto &B : F) {
         for (auto &I : B) {
-          if (auto *op = dyn_cast<BinaryOperator>(&I)) {
-            // Insert at the point where the instruction `op` appears.
-            IRBuilder<> builder(op);
+          if(auto *op = dyn_cast<LoadInst>(&I) || 
+              auto *op = dyn_cast<StoreInst>(&I) || 
+              auto *op = dyn_cast<AtomicCmpXchgInst>(&I) || 
+              auto *op = dyn_cast<AtomicRMWInst>(&I)) {
+            memAccsInstCnt++;
+          }
 
-            // Make a multiply with the same operands as `op`.
-            Value *lhs = op->getOperand(0);
-            Value *rhs = op->getOperand(1);
-            Value *mul = builder.CreateMul(lhs, rhs);
+          if(auto *op = dyn_cast<BranchInst>(&I) || auto *op = dyn_cast<IndirectBrInst>(&I)) {
+            branchInstCnt++;
+          }
 
-            // Everywhere the old instruction was used as an operand, use our
-            // new multiply instruction instead.
-            for (auto &U : op->uses()) {
-              User *user = U.getUser();  // A User is anything with operands.
-              user->setOperand(U.getOperandNo(), mul);
-            }
-
-            // We modified the code.
-            return true;
+          if(auto *op = dyn_cast<BinaryOperator>(&I)) {
+            if(op.getOpcode() == Instruction::Add ||
+                op.getOpcode() == Instruction::Sub ||
+                op.getOpcode() == Instruction::Mul ||
+                op.getOpcode() == Instruction::Shl) {
+              arithmInstCnt++;
+            } 
           }
         }
       }
+
+      errs() << memAccsInstCnt << " memory access instructions" << "\n";
+      errs() << branchInstCnt << " branch and indirect branch instructions" << "\n";
+      errs() << arithmInstCnt << " arithmetic instructions" << "\n";
 
       return false;
     }
