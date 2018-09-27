@@ -34,7 +34,7 @@ namespace {
             branchInstCnt++;
           }
 
-          if(dyn_cast<BinaryOperator>(&I)) {
+          if(auto *op = dyn_cast<BinaryOperator>(&I)) {
             if(op->getOpcode() == Instruction::Add ||
                 op->getOpcode() == Instruction::Sub ||
                 op->getOpcode() == Instruction::Mul ||
