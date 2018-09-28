@@ -37,8 +37,15 @@ namespace {
           if(auto *op = dyn_cast<BinaryOperator>(&I)) {
             if(op->getOpcode() == Instruction::Add ||
                 op->getOpcode() == Instruction::Sub ||
+                op->getOpcode() == Instruction::FSub ||
                 op->getOpcode() == Instruction::Mul ||
-                op->getOpcode() == Instruction::Shl) {
+                op->getOpcode() == Instruction::FMul ||
+                op->getOpcode() == Instruction::UDiv ||
+                op->getOpcode() == Instruction::SDiv ||
+                op->getOpcode() == Instruction::FDiv ||
+                op->getOpcode() == Instruction::URem ||
+                op->getOpcode() == Instruction::SRem ||
+                op->getOpcode() == Instruction::FRem) {
               arithmInstCnt++;
             } 
           }
@@ -57,8 +64,6 @@ namespace {
 
 char SkeletonPass::ID = 0;
 
-// Automatically enable the pass.
-// http://adriansampson.net/blog/clangpass.html
 static void registerSkeletonPass(const PassManagerBuilder &,
                          legacy::PassManagerBase &PM) {
   PM.add(new SkeletonPass());
