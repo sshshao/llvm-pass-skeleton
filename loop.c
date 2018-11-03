@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-int isValidSudoku(char** board);
-int isPartialValid(char** board, int r1, int c1, int r1, int c2);
+int isValidSudoku(char board[9][9]);
+int isPartialValid(char board[9][9], int r1, int c1, int r2, int c2);
 
 int main() {
     char board[9][9] = 
@@ -22,7 +22,7 @@ int main() {
     return 0;
 }
 
-int isValidSudoku(char** board) {
+int isValidSudoku(char board[9][9]) {
     for(int i = 0; i < 9; i++) {
         if(isPartialValid(board, i, 0, i, 8) == 0) {
             return 0;
@@ -42,7 +42,7 @@ int isValidSudoku(char** board) {
     return 1;
 }
 
-int isPartialValid(char** board, int r1, int c1, int r2, int c2) {
+int isPartialValid(char board[9][9], int r1, int c1, int r2, int c2) {
     //Hashset for char '0'-'9'
     int hashset[9];
 
