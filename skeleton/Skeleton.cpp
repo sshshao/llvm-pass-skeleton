@@ -23,7 +23,7 @@ namespace {
         virtual bool runOnFunction(Function &F) {
             LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
             for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
-                BlocksInLoop (*i,0);
+                errs() << "Iterated once.";
             }
 
             errs() << "Function " << F.getName () + "{\n";
