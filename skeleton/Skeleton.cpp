@@ -7,6 +7,7 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include <llvm/Analysis/LoopInfo.h>
+#include <llvm/Analysis/Dominators.h>
 
 using namespace llvm;
 
@@ -28,31 +29,12 @@ namespace {
         }
 
         virtual bool runOnFunction(Function &F) {
-            errs() << "Function " << F.getName () + "{\n";
-            LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
-            for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
-                handleLoop(*i);
+            errs() << "Function " << F.getName () + "\n";
+            BasicBlock *h = L->getHeader();
+            if (BranchInst *bi = dyn_cast<BranchInst>(h->getTerminator())) {
+                Value *loopCond = bi->getCondition();
+                errs() << "Loop condition " << loopCond.getName();
             }
-
-            /*
-            for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
-                errs() << "Iterated \n";
-            }
-
-            errs() << "Function " << F.getName () + "{\n";
-            for(Function::iterator b = F.begin(), be = F.end(); b != be; ++b) {
-                for(LoopInfo::iterator L = LI.begin(), e = LI.end(); L!=e; ++L) {
-                    //if(L->contains(&*b)) {
-                    //    break; // Skip those BB that belong to a loop.
-                    //}       
-                }  
-                for(BasicBlock::iterator i = b->begin(), ie = b->end(); i != ie; i ++) {
-                    if(isa<CallInst>(&(*i)) || isa<InvokeInst>(&(*i))) {
-                        errs()<<"Call "<< cast<CallInst>(&(*i))->getCalledFunction()->getName() << "\n"; 
-                    }
-                }
-            }
-            */
 
             return false;
         }
