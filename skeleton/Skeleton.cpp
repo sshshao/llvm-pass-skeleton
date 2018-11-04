@@ -33,18 +33,14 @@ namespace {
         virtual bool runOnFunction(Function &F) {
             errs() << "Function " << F.getName() + "\n";
 
-            DominatorTree *DT = &getAnalysis<DominatorTreeWrapperPass>(F).getDomTree();
-            /*
-            for (auto node = GraphTraits<DominatorTree *>::nodes_begin(DT); node != GraphTraits<DominatorTree*>::nodes_end(DT); ++node) {
-                BasicBlock *BB = node->getBlock();
-                errs
-                // whatever you want to do with BB
-                if (BranchInst *bi = dyn_cast<BranchInst>(BB->getTerminator())) {
-                    Value *loopCond = bi->getCondition();
-                    //errs() << "Loop condition " << loopCond->getName() + "\n";
+            for (Function::iterator I = F.begin(); I != F.end(); I++) {
+                BasicBlock *BB = I;
+                for (BasicBlock::iterator BI = BB->begin(), BE = BB->end(); BI != BE;) {
+                    Instruction &I = *BI++;
+                    //did noting inside
+                    err() << "Instruction " << I->getOpcodeName() + "\n";
                 }
             }
-            */
 
             return false;
         }
