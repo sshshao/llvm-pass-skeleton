@@ -7,7 +7,7 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include <llvm/Analysis/LoopInfo.h>
-#include <llvm/Analysis/Dominators.h>
+#include "llvm/IR/Dominators.h"
 
 using namespace llvm;
 
