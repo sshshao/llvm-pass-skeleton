@@ -37,8 +37,8 @@ namespace {
                 BasicBlock &BB = *I;
                 errs() << "BasicBlock " << BB.getName() << "\n";
 
-                for (BasicBlock::iterator BI = BB->begin(), BE = BB->end(); BI != BE;) {
-                    Instruction &I = *BI++;
+                for (BasicBlock::iterator BI = BB.begin(), BE = BB.end(); BI != BE; ++BI) {
+                    Instruction &Inst = *BI;
                     errs() << "Instruction " << Inst.getOpcodeName() << "\n";
                 }
                 /*
