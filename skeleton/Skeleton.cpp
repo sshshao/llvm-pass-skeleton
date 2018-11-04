@@ -30,12 +30,17 @@ namespace {
 
         virtual bool runOnFunction(Function &F) {
             errs() << "Function " << F.getName () + "\n";
-            BasicBlock *h = L->getHeader();
-            if (BranchInst *bi = dyn_cast<BranchInst>(h->getTerminator())) {
-                Value *loopCond = bi->getCondition();
-                errs() << "Loop condition " << loopCond.getName();
-            }
 
+            DominatorTree *DT = &getAnalysis<DominatorTreeWrapperPass>(F).getDomTree();
+            for (auto node = GraphTraits<DominatorTree *>::nodes_begin(DT); node != GraphTraits<DominatorTree*>::nodes_end(DT); ++node) {
+                BasicBlock *BB = node->getBlock();
+                // whatever you want to do with BB
+                if (BranchInst *bi = dyn_cast<BranchInst>(BB->getTerminator())) {
+                    Value *loopCond = bi->getCondition();
+                    errs() << "Loop condition " << loopCond->getName();
+                }
+            }
+            
             return false;
         }
     };
