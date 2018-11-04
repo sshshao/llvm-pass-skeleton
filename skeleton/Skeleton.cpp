@@ -28,11 +28,12 @@ namespace {
         }
 
         virtual bool runOnFunction(Function &F) {
+            errs() << "Function " << F.getName () + "{\n";
             LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
             for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
                 handleLoop(*i);
             }
-            
+
             /*
             for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
                 errs() << "Iterated \n";
