@@ -29,9 +29,9 @@ namespace {
             errs() << "Function " << F.getName () + "{\n";
             for(Function::iterator b = F.begin(), be = F.end(); b != be; ++b) {
                 for(LoopInfo::iterator L = LI.begin(), e = LI.end(); L!=e; ++L) {
-                    if(L->contains(&*b)) {
-                        break; // Skip those BB that belong to a loop.
-                    }       
+                    //if(L->contains(&*b)) {
+                    //    break; // Skip those BB that belong to a loop.
+                    //}       
                 }  
                 for(BasicBlock::iterator i = b->begin(), ie = b->end(); i != ie; i ++) {
                     if(isa<CallInst>(&(*i)) || isa<InvokeInst>(&(*i))) {
