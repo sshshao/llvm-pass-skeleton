@@ -34,12 +34,21 @@ namespace {
             errs() << "Function " << F.getName() + "\n";
 
             for (Function::iterator I = F.begin(); I != F.end(); I++) {
+                BasicBlock &BB = *I;
+                errs() << "BasicBlock " << BB.getName() << "\n";
+
+                for (BasicBlock::iterator BI = BB->begin(), BE = BB->end(); BI != BE;) {
+                    Instruction &I = *BI++;
+                    errs() << "Instruction " << Inst.getOpcodeName() << "\n";
+                }
+                /*
                 for (BasicBlock::iterator BB = I->begin(), BE = I->end(); BB != BE; ++BB) {
                     errs() << "BasicBlock " << BB.getName() << "\n";
                     Instruction &Inst = *BB;
                     //did noting inside
                     errs() << "Instruction " << Inst.getOpcodeName() << "\n";
                 }
+                */
             }
 
             return false;
