@@ -6,6 +6,8 @@
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
+#include <llvm/Analysis/LoopInfo.h>
+
 using namespace llvm;
 
 namespace {
