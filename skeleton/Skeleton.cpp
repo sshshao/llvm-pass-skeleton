@@ -13,8 +13,13 @@ namespace {
         static char ID;
         SkeletonPass() : FunctionPass(ID) {}
 
+        void getAnalysisUsage(AnalysisUsage &AU) const override {
+            AU.setPreservesCFG();
+            AU.addRequired<LoopInfoWrapperPass>();
+        }
+
         virtual bool runOnFunction(Function &F) {
-            LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>(F).getLoopInfo();
+            LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
             for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
                 BlocksInLoop (*i,0);
             }
