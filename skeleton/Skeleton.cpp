@@ -22,8 +22,27 @@ namespace {
 
         virtual bool runOnFunction(Function &F) {
             LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
+            errs().write_escaped(F.getName());
+            errs() << " : ";
+            for(Function::iterator b = F.begin(), be = F.end(); b != be; ++b){
+                errs() << "\n\t BB : ";
+                bool isLoop = LI.getLoopFor(b);
+                if(isLoop){ 
+                    errs() << "loop{";
+                }
+                for(BasicBlock::iterator i = b->begin() , ie = b->end(); i!=ie; ++i){
+                    if(isa<CallInst>(&(*i)) || isa<InvokeInst>(&(*i))){
+                        errs() << cast<CallInst>(&(*i))->getCalledFunction()->getName() << "\t";
+                    }
+                }
+                if(isLoop){ 
+                    errs() << "}";
+                }
+            }
+            errs() << '\n';
+            /*
             for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
-                errs() << "Iterated once.";
+                errs() << "Iterated \n";
             }
 
             errs() << "Function " << F.getName () + "{\n";
@@ -39,6 +58,7 @@ namespace {
                     }
                 }
             }
+            */
 
             return false;
         }
