@@ -16,6 +16,7 @@ namespace {
         static char ID;
         SkeletonPass() : FunctionPass(ID) {}
 
+        /*
         void getAnalysisUsage(AnalysisUsage &AU) const override {
             AU.setPreservesCFG();
             AU.addRequired<LoopInfoWrapperPass>();
@@ -27,20 +28,24 @@ namespace {
                 handleLoop(SL);
             }
         }
+        */
 
         virtual bool runOnFunction(Function &F) {
-            errs() << "Function " << F.getName () + "\n";
+            errs() << "Function " << F.getName() + "\n";
 
             DominatorTree *DT = &getAnalysis<DominatorTreeWrapperPass>(F).getDomTree();
+            /*
             for (auto node = GraphTraits<DominatorTree *>::nodes_begin(DT); node != GraphTraits<DominatorTree*>::nodes_end(DT); ++node) {
                 BasicBlock *BB = node->getBlock();
+                errs
                 // whatever you want to do with BB
                 if (BranchInst *bi = dyn_cast<BranchInst>(BB->getTerminator())) {
                     Value *loopCond = bi->getCondition();
-                    errs() << "Loop condition " << loopCond->getName();
+                    //errs() << "Loop condition " << loopCond->getName() + "\n";
                 }
             }
-            
+            */
+
             return false;
         }
     };
