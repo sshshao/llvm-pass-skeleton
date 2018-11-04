@@ -20,26 +20,19 @@ namespace {
             AU.addRequired<LoopInfoWrapperPass>();
         }
 
+        void handleLoop(Loop *L) {
+            errs() << "Iterated \n";
+            for (Loop *SL : L->getSubLoops()) {
+                handleLoop(SL);
+            }
+        }
+
         virtual bool runOnFunction(Function &F) {
             LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
-            errs().write_escaped(F.getName());
-            errs() << " : ";
-            for(Function::iterator b = F.begin(), be = F.end(); b != be; ++b){
-                errs() << "\n\t BB : ";
-                bool isLoop = LI.getLoopFor(b);
-                if(isLoop){ 
-                    errs() << "loop{";
-                }
-                for(BasicBlock::iterator i = b->begin() , ie = b->end(); i!=ie; ++i){
-                    if(isa<CallInst>(&(*i)) || isa<InvokeInst>(&(*i))){
-                        errs() << cast<CallInst>(&(*i))->getCalledFunction()->getName() << "\t";
-                    }
-                }
-                if(isLoop){ 
-                    errs() << "}";
-                }
+            for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
+                handleLoop(*i);
             }
-            errs() << '\n';
+            
             /*
             for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
                 errs() << "Iterated \n";
