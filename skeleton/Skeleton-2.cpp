@@ -25,10 +25,10 @@ namespace {
             int loopCnt = 0;
             std::unordered_map<BasicBlock*, int> map;
             auto* dTree = new DominatorTree(F);
-            DomTreeNodeBase<BasicBlock> *root = dTree->getRootNode();
+            DomTreeNodeBase<BasicBlock> *root = dTree->getRootNode();	
 
-            for (auto BBIter = root.begin(); root != F.end(); ++BBIter) {
-                BasicBlock *BB = &(*BBIter);
+            for (Function::iterator I = F.begin(); I != F.end(); ++I) {
+                BasicBlock *BB = &(*I);
                 map[BB] = bbCnt;
                 bbCnt++;
             }
