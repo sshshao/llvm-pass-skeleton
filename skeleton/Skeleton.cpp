@@ -21,11 +21,11 @@ namespace {
             errs() << "Function " << F.getName() + "\n";
 
             int bbCnt = 0;
-            std::unordered_map<BasicBlock, int> map; 
+            std::unordered_map<BasicBlock*, int> map; 
 
             for (Function::iterator I = F.begin(); I != F.end(); I++) {
-                BasicBlock &BB = *I;
-                errs() << "BasicBlock " << bbCnt << BB.getName() << "\n";
+                BasicBlock* BB = I;
+                errs() << "BasicBlock " << bbCnt << BB->getName() << "\n";
 
                 map[BB] = bbCnt;
                 bbCnt++;
@@ -42,15 +42,15 @@ namespace {
 
             int loopCnt = 0;
             for (Function::iterator I = F.begin(); I != F.end(); I++) {
-                BasicBlock &BB = *I;
+                BasicBlock* BB = I;
                 int bbIdx = -1;
-                std::unordered_map<BasicBlock, int>::const_iterator mapIter = map.find(BB);
+                std::unordered_map<BasicBlock*, int>::const_iterator mapIter = map.find(BB);
 
                 if(mapIter != map.end()) {
                     bbIdx = mapIter->second;
                 }
 
-                for (BasicBlock *Pred : predecessors(BB)) {
+                for (BasicBlock *Pred : predecessors(&BB)) {
                     int predIdx = -1;
                     mapIter = map.find(Pred);
                     if (mapIter != map.end()) {
