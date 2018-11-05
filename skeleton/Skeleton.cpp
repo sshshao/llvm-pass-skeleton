@@ -9,6 +9,7 @@
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include "llvm/Analysis/LoopInfo.h"
 #include "llvm/IR/Dominators.h"
+#include "llvm/ADT/APFloat.h"
 
 using namespace llvm;
 
@@ -16,6 +17,10 @@ namespace {
     struct SkeletonPass : public FunctionPass {
         static char ID;
         SkeletonPass() : FunctionPass(ID) {}
+
+        void getLoopStat(auto* dTree, BasicBlock *head, BasicBlock *tail) {
+
+        }
 
         virtual bool runOnFunction(Function &F) {
             errs() << "Entering Function " << F.getName() + "\n";
@@ -44,9 +49,29 @@ namespace {
 
             for (std::pair<BasicBlock*, int> block : map) {
                 for (BasicBlock *Succ : successors(block.first)) {
+                    //Check if successor dominants block
                     if (dTree->properlyDominates(Succ, block.first)) {
+                        //Count enclosing basicblocks and instructions
+                        int inBBCnt = 0;
+                        int inInstCnt = 0;
+                        BasicBlock* head = Succ;
+                        BasicBlock* tail = block.first;
+
+                        SmallVector<BasicBlock *, 0> descendants;
+                        dTree->getDescendants(&head, descendants);
+                        for (BasicBlock::iterator *inBBIter = descendants.begin(); inBBIter != descendants.end(); ++inBBIter) {
+                            BasicBlock *inBB = &(*inBBIter);
+                            if(dTree->dominates(inBB, tail)) {
+                                inBBCnt++;
+                                for (BasicBlock::iterator BI = inBB.begin(); BI != inBB.end(); ++BI) {
+                                    inInstCnt++;
+                                }
+                            }
+                        }
+
                         errs() << "Loop " << loopCnt << ": BasicBlock " << block.second 
                             << " goes back to Block " << map.at(Succ) << "\n";
+                        errs() << "\t " << inBBCnt << " basic blocks; " << inInstCnt << " instructions\n";
 
                         loopCnt++;
                     }
