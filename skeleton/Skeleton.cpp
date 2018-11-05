@@ -7,8 +7,7 @@
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
-#include <llvm/Analysis/LoopInfo.h>
-#include "llvm/IR/CFG.h"
+#include "llvm/IR/Dominators.h"
 
 using namespace llvm;
 
@@ -18,10 +17,13 @@ namespace {
         SkeletonPass() : FunctionPass(ID) {}
 
         virtual bool runOnFunction(Function &F) {
-            errs() << "Function " << F.getName() + "\n";
+            errs() << "Entering Function " << F.getName() + "\n";
 
             int bbCnt = 0;
+            int loopCnt = 0;
             std::unordered_map<BasicBlock*, int> map;
+            llvm::DominatorTree::DominatorTree(F) dTree;
+            DomTreeNodeBase<NodeT> *root = dTree.getRootNode();	
 
             for (Function::iterator I = F.begin(); I != F.end(); I++) {
                 BasicBlock *BB = &(*I);
@@ -40,30 +42,18 @@ namespace {
                 */
             }
 
-            int loopCnt = 0;
-            for (Function::iterator I = F.begin(); I != F.end(); I++) {
-                BasicBlock *BB = &(*I);
-                int bbIdx = -1;
-                std::unordered_map<BasicBlock*, int>::const_iterator mapIter = map.find(BB);
-
-                if(mapIter != map.end()) {
-                    bbIdx = mapIter->second;
-                }
-
+            for (BasicBlock *BB = nodes.begid(); BB != nodes.end(); ++BB) {
                 for (BasicBlock *Pred : predecessors(BB)) {
-                    int predIdx = -1;
-                    mapIter = map.find(Pred);
-                    if (mapIter != map.end()) {
-                        predIdx = mapIter->second;
-                    }
+                    if (properlyDominates(Pred, BB)) {
+                        errs() << "Loop " << loopCnt << "\t";
+                        errs() << "Loop detected: BasicBlock " << map.at(BB) << " goes back to Node" << map.at(Pred) << "\n";
 
-                    if(predIdx > bbIdx) {
-                        errs() << "Loop " << loopCnt << "\n";
                         loopCnt++;
                     }
                 }
             }
-
+            
+            errs() << "Exiting Function " << F.getName() + "\n\n";
             return false;
         }
     };
