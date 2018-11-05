@@ -22,8 +22,8 @@ namespace {
             int bbCnt = 0;
             int loopCnt = 0;
             std::unordered_map<BasicBlock*, int> map;
-            llvm::DominatorTree::DominatorTree(F) dTree;
-            DomTreeNodeBase<NodeT> *root = dTree.getRootNode();	
+            auto* dTree = new DominatorTree(F);
+            DomTreeNodeBase<BasicBlock> *root = dTree.getRootNode();	
 
             for (Function::iterator I = F.begin(); I != F.end(); I++) {
                 BasicBlock *BB = &(*I);
@@ -42,17 +42,18 @@ namespace {
                 */
             }
 
-            for (BasicBlock *BB = nodes.begid(); BB != nodes.end(); ++BB) {
-                for (BasicBlock *Pred : predecessors(BB)) {
-                    if (properlyDominates(Pred, BB)) {
+            for (std::pair<BasicBlock*, int> block : wordMap) {
+                for (BasicBlock *Pred : predecessors(block.first)) {
+                    if (properlyDominates(Pred, block.first)) {
                         errs() << "Loop " << loopCnt << "\t";
-                        errs() << "Loop detected: BasicBlock " << map.at(BB) << " goes back to Node" << map.at(Pred) << "\n";
+                        errs() << "Loop detected: BasicBlock " << map.at(block.second) << " goes back to Node" << map.at(Pred) << "\n";
 
                         loopCnt++;
                     }
                 }
             }
-            
+
+            delete dTree;
             errs() << "Exiting Function " << F.getName() + "\n\n";
             return false;
         }
