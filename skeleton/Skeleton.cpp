@@ -23,7 +23,7 @@ namespace {
             int loopCnt = 0;
             std::unordered_map<BasicBlock*, int> map;
             auto* dTree = new DominatorTree(F);
-            DomTreeNodeBase<BasicBlock> *root = dTree.getRootNode();	
+            DomTreeNodeBase<BasicBlock> *root = dTree->getRootNode();	
 
             for (Function::iterator I = F.begin(); I != F.end(); I++) {
                 BasicBlock *BB = &(*I);
@@ -42,7 +42,7 @@ namespace {
                 */
             }
 
-            for (std::pair<BasicBlock*, int> block : wordMap) {
+            for (std::pair<BasicBlock*, int> block : map) {
                 for (BasicBlock *Pred : predecessors(block.first)) {
                     if (properlyDominates(Pred, block.first)) {
                         errs() << "Loop " << loopCnt << "\t";
