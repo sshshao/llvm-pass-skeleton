@@ -18,10 +18,6 @@ namespace {
         static char ID;
         SkeletonPass() : FunctionPass(ID) {}
 
-        void getLoopStat(auto* dTree, BasicBlock *head, BasicBlock *tail) {
-
-        }
-
         virtual bool runOnFunction(Function &F) {
             errs() << "Entering Function " << F.getName() + "\n";
 
