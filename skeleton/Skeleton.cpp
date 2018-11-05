@@ -28,8 +28,6 @@ namespace {
 
             for (Function::iterator I = F.begin(); I != F.end(); I++) {
                 BasicBlock *BB = &(*I);
-                errs() << "BasicBlock " << bbCnt << BB->getName() << "\n";
-
                 map[BB] = bbCnt;
                 bbCnt++;
 
@@ -42,12 +40,13 @@ namespace {
                 }
                 */
             }
+            errs() << bbCnt << " BasicBlocks detected\n";
 
             for (std::pair<BasicBlock*, int> block : map) {
                 for (BasicBlock *Succ : successors(block.first)) {
                     if (dTree->properlyDominates(Succ, block.first)) {
-                        errs() << "Loop " << loopCnt << "\t";
-                        errs() << "Loop detected: BasicBlock " << block.second << " goes back to Block " << map.at(Succ) << "\n";
+                        errs() << "Loop " << loopCnt << ": BasicBlock " << block.second 
+                            << " goes back to Block " << map.at(Succ) << "\n";
 
                         loopCnt++;
                     }
