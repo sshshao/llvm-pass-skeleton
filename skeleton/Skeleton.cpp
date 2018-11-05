@@ -59,7 +59,7 @@ namespace {
 
                         SmallVector<BasicBlock *, 0> descendants;
                         dTree->getDescendants(head, descendants);
-                        for (BasicBlock*::iterator inBBIter = descendants.begin(); inBBIter != descendants.end(); ++inBBIter) {
+                        for (auto inBBIter = descendants.begin(); inBBIter != descendants.end(); ++inBBIter) {
                             BasicBlock *inBB = inBBIter;
                             if(dTree->dominates(inBB, tail)) {
                                 inBBCnt++;
