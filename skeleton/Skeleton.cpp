@@ -59,10 +59,9 @@ namespace {
 
                     if(predIdx > bbIdx) {
                         errs() << "Loop " << loopCnt << "\n";
+                        loopCnt++;
                     }
                 }
-
-                loopCnt++;
             }
 
             return false;
