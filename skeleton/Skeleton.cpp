@@ -7,6 +7,7 @@
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
+#include "llvm/Analysis/LoopInfo.h"
 #include "llvm/IR/Dominators.h"
 
 using namespace llvm;
@@ -44,9 +45,9 @@ namespace {
 
             for (std::pair<BasicBlock*, int> block : map) {
                 for (BasicBlock *Pred : predecessors(block.first)) {
-                    if (properlyDominates(Pred, block.first)) {
+                    if (DominatorTreeBase<NodeT, IsPostDom>::properlyDominates(Pred, block.first)) {
                         errs() << "Loop " << loopCnt << "\t";
-                        errs() << "Loop detected: BasicBlock " << map.at(block.second) << " goes back to Node" << map.at(Pred) << "\n";
+                        errs() << "Loop detected: BasicBlock " << block.second << " goes back to Node" << map.at(Pred) << "\n";
 
                         loopCnt++;
                     }
