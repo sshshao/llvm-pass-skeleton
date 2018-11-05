@@ -45,9 +45,9 @@ namespace {
 
             for (std::pair<BasicBlock*, int> block : map) {
                 for (BasicBlock *Pred : predecessors(block.first)) {
-                    if (dTree->properlyDominates(Pred, block.first)) {
+                    if (dTree->dominates(Pred, block.first)) {
                         errs() << "Loop " << loopCnt << "\t";
-                        errs() << "Loop detected: BasicBlock " << block.second << " goes back to Node" << map.at(Pred) << "\n";
+                        errs() << "Loop detected: BasicBlock " << block.second << " goes back to Block " << map.at(Pred) << "\n";
 
                         loopCnt++;
                     }
