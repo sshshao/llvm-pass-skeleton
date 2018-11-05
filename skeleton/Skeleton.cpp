@@ -63,7 +63,7 @@ namespace {
                             BasicBlock *inBB = *inBBIter;
                             if(dTree->dominates(inBB, tail)) {
                                 inBBCnt++;
-                                for (BasicBlock::iterator BI = inBB.begin(); BI != inBB.end(); ++BI) {
+                                for (BasicBlock::iterator BI = inBB->begin(); BI != inBB->end(); ++BI) {
                                     inInstCnt++;
                                 }
                             }
