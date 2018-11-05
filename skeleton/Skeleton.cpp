@@ -28,7 +28,7 @@ namespace {
             DomTreeNodeBase<BasicBlock> *root = dTree->getRootNode();
 
             for (auto BBIter = root->begin(); BBIter != root->end(); ++BBIter) {
-                BasicBlock *BB = BBIter;
+                BasicBlock *BB = BBIter->getBlock();
                 map[BB] = bbCnt;
                 bbCnt++;
             }
