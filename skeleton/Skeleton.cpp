@@ -31,15 +31,6 @@ namespace {
                 BasicBlock *BB = &(*I);
                 map[BB] = bbCnt;
                 bbCnt++;
-
-                /*
-                int instCnt = 0;
-                for (BasicBlock::iterator BI = BB.begin(), BE = BB.end(); BI != BE; ++BI) {
-                    Instruction &Inst = *BI;
-                    errs() << "Instruction " << Inst.getOpcodeName() << "\n";
-                    instCnt++;
-                }
-                */
             }
             errs() << bbCnt << " BasicBlocks detected\n";
 
