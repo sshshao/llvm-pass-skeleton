@@ -25,8 +25,9 @@ namespace {
             int loopCnt = 0;
             std::unordered_map<BasicBlock*, int> map;
             auto* dTree = new DominatorTree(F);
+            DomTreeNodeBase<BasicBlock> *root = dTree->getRootNode();
 
-            for (auto BBIter = dTree->begin(); BBIter != dTree->end(); ++BBIter) {
+            for (auto BBIter = root->begin(); BBIter != root->end(); ++BBIter) {
                 BasicBlock *BB = BBIter->getNode()->getBlock();
                 map[BB] = bbCnt;
                 bbCnt++;
