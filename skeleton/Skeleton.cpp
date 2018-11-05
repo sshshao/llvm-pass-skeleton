@@ -27,7 +27,7 @@ namespace {
             auto* dTree = new DominatorTree(F);
             DomTreeNodeBase<BasicBlock> *root = dTree->getRootNode();	
 
-            for (Function::iterator I = F.begin(); I != F.end(); I++) {
+            for (Function::iterator I = F.begin(); I != F.end(); ++I) {
                 BasicBlock *BB = &(*I);
                 map[BB] = bbCnt;
                 bbCnt++;
