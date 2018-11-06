@@ -2,6 +2,9 @@ int main(int argc, char **argv) {
     for (int i = 0 ; i < 20 ; i *= 2) {
         for (int j = 0; j < 15; j++) {
             i++;
+            for (int k = 0; k < 15; k++) {
+                i += 2;
+            }
         }
         for (int k = 0; k < 15; k++) {
             i += 2;
