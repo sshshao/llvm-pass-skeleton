@@ -1,15 +1,24 @@
-#include <iostream>
 int main(int argc, char **argv) {
-    bool useless_flag = false;
-    for (int i = 0 ; i < 500 ; i *= 2) {
-        std::cout << "Although end condition seems pretty big, this line won't be printed too many times…" << std::endl;
+    for (int i = 0 ; i < 20 ; i *= 2) {
         if ((i & 0x1) == 0) {
-            std::cout << "Now i is an even number!" << std::endl;
-            useless_flag = !useless_flag;
+            for (int j = 0; j < 15; j++) {
+                i++;
+            }
         } else {
-            std::cout << "Now i is an odd number!" << std::endl;
-            std::cout << "let's make this more interesting by introducing another if-else!" << std::endl;
+            for (int k = 0; k < 15; k++) {
+                i += 2;
+            }
         }
     }
-    std::cout << "Finally the useless flag is: " << useless_flag << std::endl;
+
+    int j;
+    for (int i = 0; i < 50; i++) {
+        j = i;
+    }
+    for(int i = 0; i < 40; i++) {
+        j -= i;
+        for(int k = 0; k < 5; k++) {
+            j += 2;
+        }
+    }
 }
