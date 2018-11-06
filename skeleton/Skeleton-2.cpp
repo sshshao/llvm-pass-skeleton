@@ -93,7 +93,7 @@ namespace {
 
                     for (BasicBlock *Succ: predecessors(current)) {
                         if(loopTailMap.count(Succ) == 1) {
-                            errs() << "Loop " << loopCur.second << " is nested within loop " << loopTailMap.at(Succ);
+                            errs() << "Loop " << loopCur.second << " is nested within loop " << loopTailMap.at(Succ) + "\n";
                         }
                         queue.push_back(Succ);
                     }
