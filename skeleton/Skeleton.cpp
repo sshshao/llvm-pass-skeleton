@@ -97,7 +97,7 @@ namespace {
                     BasicBlock *current = queue.front();
                     if(current != head) {
                         if(current != tail && loopTailMap.count(current) == 1) {
-                            errs() << "Loop " << loopCur.second << " is nested within loop " << loopTailMap.at(current) << "\n";
+                            errs() << "Loop " << loopTailMap.at(current) << " is nested within loop " << loopCur.second << "\n";
                         }
                         for (BasicBlock *Succ: predecessors(current)) {
                             if(visited.count(Succ) == 0) {
