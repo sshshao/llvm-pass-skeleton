@@ -33,7 +33,7 @@ namespace {
                 map[BB] = bbCnt;
                 bbCnt++;
             }
-            errs() << bbCnt << " BasicBlocks detected\n";
+            errs() << map.size() << " BasicBlocks detected\n";
 
             std::unordered_map<int, BasicBlock*> loopHeadMap;
             std::unordered_map<BasicBlock*, int> loopTailMap;
