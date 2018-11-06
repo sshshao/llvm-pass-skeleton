@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 int isPartialValid(char board[9][9], int r1, int c1, int r2, int c2);
 int isValidSudoku(char board[9][9]);
 
