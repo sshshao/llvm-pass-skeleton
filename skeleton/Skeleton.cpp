@@ -49,7 +49,7 @@ namespace {
 
                         //BFS
                         std::list<BasicBlock*> queue;
-                        unordered_set<BasicBlock*> visited;
+                        std::unordered_set<BasicBlock*> visited;
 
                         queue.push_back(tail);
                         while (!queue.empty()) {
@@ -67,7 +67,7 @@ namespace {
                                     }
                                 }
                             }
-                            
+
                             visited.insert(current);
                             queue.pop_front();
                         }
