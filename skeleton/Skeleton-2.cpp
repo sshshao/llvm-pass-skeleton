@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <list>
 #include "llvm/Pass.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Support/raw_ostream.h"
@@ -25,7 +26,7 @@ namespace {
             int loopCnt = 0;
             std::unordered_map<BasicBlock*, int> map;
             auto* dTree = new DominatorTree(F);
-            DomTreeNodeBase<BasicBlock> *root = dTree->getRootNode();	
+            DomTreeNodeBase<BasicBlock> *root = dTree->getRootNode();
 
             for (Function::iterator I = F.begin(); I != F.end(); ++I) {
                 BasicBlock *BB = &(*I);
@@ -34,34 +35,69 @@ namespace {
             }
             errs() << bbCnt << " BasicBlocks detected\n";
 
+            std::unordered_map<int, BasicBlock*> loopHeadMap;
+            std::unordered_map<BasicBlock*, int> loopTailMap;
             for (std::pair<BasicBlock*, int> block : map) {
                 for (BasicBlock *Succ : successors(block.first)) {
                     //Check if successor dominants block
                     if (dTree->properlyDominates(Succ, block.first)) {
                         //Count enclosing basicblocks and instructions
-                        int inBBCnt = 0;
+                        int inBBCnt = 1;
                         int inInstCnt = 0;
                         BasicBlock* head = Succ;
                         BasicBlock* tail = block.first;
 
-                        SmallVector<BasicBlock *, 0> descendants;
-                        dTree->getDescendants(head, descendants);
-                        for (auto inBBIter = descendants.begin(); inBBIter != descendants.end(); ++inBBIter) {
-                            BasicBlock *inBB = *inBBIter;
-                            if(dTree->dominates(inBB, tail)) {
-                                inBBCnt++;
-                                for (BasicBlock::iterator BI = inBB->begin(); BI != inBB->end(); ++BI) {
-                                    inInstCnt++;
-                                }
+                        //BFS
+                        list<BasicBlock*> queue;
+                        queue.push_back(tail);
+                        while (!queue.empty()) {
+                            BasicBlock *current = queue.front();
+                            if(current == head) {
+                                break;
                             }
+
+                            inBBCnt++;
+                            for (BasicBlock::iterator BI = current->begin(); BI != current->end(); ++BI) {
+                                inInstCnt++;
+                            }
+
+                            for (BasicBlock *Succ: predecessors(current)) {
+                                queue.push_back(Succ);
+                            }
+                            queue.pop_front();
                         }
 
                         errs() << "Loop " << loopCnt << ": BasicBlock " << block.second 
                             << " goes back to Block " << map.at(Succ) << "\n";
                         errs() << "\t " << inBBCnt << " basic blocks; " << inInstCnt << " instructions\n";
 
+                        loopHeadMap[loopCnt] = head;
+                        loopTailMap[tail] = loopCnt;
                         loopCnt++;
                     }
+                }
+            }
+
+            for (std::pair<BasicBlock*, int> loopCur : loopTailMap) {
+                BasicBlock *tail = loopCur.first;
+                BasicBlock *head = loopHeadMap.at(loopCur.second);
+
+                //BFS
+                list<BasicBlock*> queue;
+                queue.push_back(tail);
+                while (!queue.empty()) {
+                    BasicBlock *current = queue.front();
+                    if(current == head) {
+                        break;
+                    }
+
+                    for (BasicBlock *Succ: predecessors(current)) {
+                        if(loopTailMap.count(Succ) == 1) {
+                            errs() << "Loop " << headIdx << " is nested within loop " << loop.at(Succ);
+                        }
+                        queue.push_back(Succ);
+                    }
+                    queue.pop_front();
                 }
             }
 
