@@ -99,9 +99,9 @@ namespace {
                         if(current != tail && loopTailMap.count(current) == 1) {
                             errs() << "Loop " << loopTailMap.at(current) << " is nested within loop " << loopCur.second << "\n";
                         }
-                        for (BasicBlock *Succ: predecessors(current)) {
-                            if(visited.count(Succ) == 0) {
-                                queue.push_back(Succ);
+                        for (BasicBlock *Pred: predecessors(current)) {
+                            if(visited.count(Pred) == 0) {
+                                queue.push_back(Pred);
                                 visited.insert(current);
                             }
                         }
