@@ -89,15 +89,21 @@ namespace {
 
                 //BFS
                 std::list<BasicBlock*> queue;
+                std::unordered_set<BasicBlock*> visited;
+
                 queue.push_back(tail);
+                visited.insert(tail);
                 while (!queue.empty()) {
                     BasicBlock *current = queue.front();
                     if(current != head) {
+                        if(current != tail && loopTailMap.count(current) == 1) {
+                            errs() << "Loop " << loopCur.second << " is nested within loop " << loopTailMap.at(current) << "\n";
+                        }
                         for (BasicBlock *Succ: predecessors(current)) {
-                            if(Succ != head && loopTailMap.count(Succ) == 1) {
-                                errs() << "Loop " << loopCur.second << " is nested within loop " << loopTailMap.at(Succ) << "\n";
+                            if(visited.count(Succ) == 0) {
+                                queue.push_back(Succ);
+                                visited.insert(current);
                             }
-                            queue.push_back(Succ);
                         }
                     }
                     queue.pop_front();
