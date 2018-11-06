@@ -49,21 +49,26 @@ namespace {
 
                         //BFS
                         std::list<BasicBlock*> queue;
+                        unordered_set<BasicBlock*> visited;
+
                         queue.push_back(tail);
                         while (!queue.empty()) {
                             BasicBlock *current = queue.front();
-                            if(current == head) {
-                                break;
-                            }
 
                             inBBCnt++;
                             for (BasicBlock::iterator BI = current->begin(); BI != current->end(); ++BI) {
                                 inInstCnt++;
                             }
 
-                            for (BasicBlock *Succ: predecessors(current)) {
-                                queue.push_back(Succ);
+                            if(current != head) {
+                                for (BasicBlock *Pred: predecessors(current)) {
+                                    if(visited.count(Pred) == 0) {
+                                        queue.push_back(Pred);
+                                    }
+                                }
                             }
+                            
+                            visited.insert(current);
                             queue.pop_front();
                         }
 
@@ -77,7 +82,7 @@ namespace {
                     }
                 }
             }
-            
+
             delete dTree;
             errs() << "Exiting Function " << F.getName() + "\n\n";
             return false;
