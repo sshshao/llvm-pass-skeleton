@@ -10,6 +10,14 @@
         "vector": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "__nullptr": "cpp",
+        "cstddef": "cpp",
+        "exception": "cpp",
+        "new": "cpp",
+        "stdexcept": "cpp",
+        "type_traits": "cpp",
+        "typeinfo": "cpp",
+        "algorithm": "cpp"
     }
 }

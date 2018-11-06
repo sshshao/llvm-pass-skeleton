@@ -48,7 +48,7 @@ namespace {
                         BasicBlock* tail = block.first;
 
                         //BFS
-                        list<BasicBlock*> queue;
+                        std::list<BasicBlock*> queue;
                         queue.push_back(tail);
                         while (!queue.empty()) {
                             BasicBlock *current = queue.front();
@@ -83,7 +83,7 @@ namespace {
                 BasicBlock *head = loopHeadMap.at(loopCur.second);
 
                 //BFS
-                list<BasicBlock*> queue;
+                std::list<BasicBlock*> queue;
                 queue.push_back(tail);
                 while (!queue.empty()) {
                     BasicBlock *current = queue.front();
@@ -93,7 +93,7 @@ namespace {
 
                     for (BasicBlock *Succ: predecessors(current)) {
                         if(loopTailMap.count(Succ) == 1) {
-                            errs() << "Loop " << headIdx << " is nested within loop " << loop.at(Succ);
+                            errs() << "Loop " << headIdx << " is nested within loop " << loopTailMap.at(Succ);
                         }
                         queue.push_back(Succ);
                     }
