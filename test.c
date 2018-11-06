@@ -1,13 +1,10 @@
 int main(int argc, char **argv) {
     for (int i = 0 ; i < 20 ; i *= 2) {
-        if ((i & 0x1) == 0) {
-            for (int j = 0; j < 15; j++) {
-                i++;
-            }
-        } else {
-            for (int k = 0; k < 15; k++) {
-                i += 2;
-            }
+        for (int j = 0; j < 15; j++) {
+            i++;
+        }
+        for (int k = 0; k < 15; k++) {
+            i += 2;
         }
     }
 
