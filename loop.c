@@ -31,6 +31,28 @@ int main() {
     return 0;
 }
 
+int isPartialValid(char board[9][9], int r1, int c1, int r2, int c2) {
+    /*
+    * Check if sub-matrix (bounded by r1, c1, r2, c2) only contains 1-9 without repetition
+    */
+    int hashset[9];
+
+    for(int i = r1; i <= r2; i++) {
+        for(int j = c1; j <= c2; j++) {
+            if(board[i][j] != '.') {
+                int number = board[i][j] - '0';
+                if(hashset[number] != 0) {
+                    return 0;
+                } else {
+                    hashset[number] = 1;
+                }
+            }
+        }
+    }
+
+    return 1;
+}
+
 int isValidSudoku(char board[9][9]) {
     /*
     * This function checks whether the given 9x9 matrix is a valid Sudoku or not
@@ -52,28 +74,6 @@ int isValidSudoku(char board[9][9]) {
                 return 0;
             }
             j += 3;
-        }
-    }
-
-    return 1;
-}
-
-int isPartialValid(char board[9][9], int r1, int c1, int r2, int c2) {
-    /*
-    * Check if sub-matrix (bounded by r1, c1, r2, c2) only contains 1-9 without repetition
-    */
-    int hashset[9];
-
-    for(int i = r1; i <= r2; i++) {
-        for(int j = c1; j <= c2; j++) {
-            if(board[i][j] != '.') {
-                int number = board[i][j] - '0';
-                if(hashset[number] != 0) {
-                    return 0;
-                } else {
-                    hashset[number] = 1;
-                }
-            }
         }
     }
 
