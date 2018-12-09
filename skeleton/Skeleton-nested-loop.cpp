@@ -71,9 +71,9 @@ namespace {
                             queue.pop_front();
                         }
 
-                        errs() << "Loop " << loopCnt << ": BasicBlock " << block.second 
-                            << " goes back to Block " << map.at(Succ) << "\n";
-                        errs() << "\t " << inBBCnt << " basic blocks; " << inInstCnt << " instructions\n";
+                        //errs() << "Loop " << loopCnt << ": BasicBlock " << block.second 
+                        //    << " goes back to Block " << map.at(Succ) << "\n";
+                        //errs() << "\t " << inBBCnt << " basic blocks; " << inInstCnt << " instructions\n";
 
                         loopHeadMap[loopCnt] = head;
                         loopTailMap[tail] = loopCnt;
