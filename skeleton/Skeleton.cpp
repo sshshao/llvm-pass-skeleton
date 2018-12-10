@@ -61,6 +61,8 @@ namespace {
                 handleLoop(*i, loopsList);
             }
 
+            errs() << "List size: " << loopsList.size() << "\n";
+
             //Check each pair of loops and identify perfectly nested loops
             int i1 = 0;
             for (std::list<Loop*>::iterator it1 = loopsList.begin(); it1 != loopsList.end(); it1++) {
