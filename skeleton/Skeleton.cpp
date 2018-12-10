@@ -24,7 +24,6 @@ namespace {
 
         void handleLoop(Loop *L, std::list<Loop*> *loopsList) {
             loopsList->push_back(L);
-            errs() << "Saved 1 loop \n";
 
             for (Loop *SL : L->getSubLoops()) {
                 handleLoop(SL, loopsList);
@@ -32,16 +31,15 @@ namespace {
         }
 
         bool isPerfectlyNested(Loop* OuterLoop, Loop* InnerLoop) {
-            errs() << "Checking nested relation \n";
-
             BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
-            BasicBlock *OuterLoopLatch = OuterLoop->getLoopLatch();
-            BasicBlock *InnerLoopPreHeader = InnerLoop->getLoopPreheader();
-
-            for (BasicBlock *Succ: successors(OuterLoopHeader)) {
+            BranchInst *OuterLoopHeaderBI = dyn_cast<BranchInst>(OuterLoopHeader->getTerminator());
+            if (!OuterLoopHeaderBI)
+                return false;
+            
+            for (BasicBlock *Succ : successors(OuterLoopHeaderBI)) {
                 if (Succ != InnerLoop->getLoopPreheader() && 
-                    Succ != OuterLoop->getLoopLatch() &&
-                    Succ != InnerLoop->getHeader()) {
+                    Succ != InnerLoop->getHeader() &&
+                    Succ != OuterLoop->getLoopLatch()) {
                     errs() << "Is not perfectly nested \n";
                     return false;
                 }
@@ -61,19 +59,17 @@ namespace {
                 handleLoop(*i, &loopsList);
             }
 
-            errs() << "List size: " << loopsList.size() << "\n";
-
             //Check each pair of loops and identify perfectly nested loops
             int i1 = 0;
             for (std::list<Loop*>::iterator it1 = loopsList.begin(); it1 != loopsList.end(); it1++) {
-                errs() << "Checking " << i1 << "\n";
                 int i2 = i1;
                 for (std::list<Loop*>::iterator it2 = it1; it2 != loopsList.end(); it2++) {
-                    errs() << "Checking " << i1 << " and " << i2 << "\n";
                     if (it2 == it1) {
                         std::advance(it2, 1);
                         i2++;
                     }
+                    errs() << "Checking " << i1 << " and " << i2 << "\n";
+
                     if (isPerfectlyNested(*it1, *it2)) {
                         errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
                     }
