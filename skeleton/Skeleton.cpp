@@ -9,6 +9,9 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include <llvm/Analysis/LoopInfo.h>
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/CFG.h"
 
 using namespace llvm;
 
