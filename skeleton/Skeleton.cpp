@@ -22,8 +22,8 @@ namespace {
             AU.addRequired<LoopInfoWrapperPass>();
         }
 
-        void handleLoop(Loop *L, std::list<Loop*> loopsList) {
-            loopsList.push_back(L);
+        void handleLoop(Loop *L, std::list<Loop*> *loopsList) {
+            loopsList->push_back(L);
             errs() << "Saved 1 loop \n";
 
             for (Loop *SL : L->getSubLoops()) {
@@ -58,7 +58,7 @@ namespace {
             //Get all loops
             LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
             for (LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
-                handleLoop(*i, loopsList);
+                handleLoop(*i, &loopsList);
             }
 
             errs() << "List size: " << loopsList.size() << "\n";
