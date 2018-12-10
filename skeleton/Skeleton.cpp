@@ -9,9 +9,6 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include <llvm/Analysis/LoopInfo.h>
-#include "llvm/IR/Instruction.h"
-#include "llvm/IR/Instructions.h"
-#include "llvm/IR/CFG.h"
 
 using namespace llvm;
 
@@ -45,11 +42,8 @@ namespace {
 
         bool isPerfectlyNested(Loop* OuterLoop, Loop* InnerLoop) {
             BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
-            BranchInst *OuterLoopHeaderBI = dyn_cast<BranchInst>(OuterLoopHeader->getTerminator());
-            if (!OuterLoopHeaderBI)
-                return false;
             
-            for (BasicBlock *Succ : successors(OuterLoopHeaderBI)) {
+            for (BasicBlock *Succ : successors(OuterLoopHeader)) {
                 if (Succ != InnerLoop->getLoopPreheader() && 
                     Succ != InnerLoop->getHeader() &&
                     Succ != getLoopEnd(OuterLoop)) {
