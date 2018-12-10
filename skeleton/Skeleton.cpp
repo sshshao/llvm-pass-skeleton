@@ -96,7 +96,29 @@ namespace {
                     BasicBlock *current = queue.front();
                     if(current != head) {
                         if(current != tail && loopTailMap.count(current) == 1) {
-                            errs() << "Loop " << loopTailMap.at(current) << " is nested within loop " << loopCur.second << "\n";
+                            //Check is perfectly nested loop or not
+                            //errs() << "Loop " << loopTailMap.at(current) << " is nested within loop " << loopCur.second << "\n";
+
+                            bool isHeadPerfect = false;
+                            bool isTailPerfect = false;
+                            BasicBlock *innerTail = current;
+                            BasicBlock *innerHead = loopHeadMap.at(loopTailMap.at(innerTail));
+
+                            for (BasicBlock *Succ : successors(head)) {
+                                for(BasicBlock *SuccL2: successors(Succ)) {
+                                    if(SuccL2 == innerHead) {
+                                        isHeadPerfect = true;
+                                    }
+                                }
+                            }
+                            for (BasicBlock *Pred : predecessors(tail)) {
+                                if(Pred == innerTail) {
+                                    isTailPerfect = true;
+                                }
+                            }
+                            if(isHeadPerfect && isTailPerfect) {
+                                errs() << "Loop " << loopTailMap.at(innerTail) << " is perfectly nested within loop " << loopCur.second << "\n";
+                            }
                         }
                         for (BasicBlock *Pred: predecessors(current)) {
                             if(visited.count(Pred) == 0) {
