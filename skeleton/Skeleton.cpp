@@ -37,7 +37,8 @@ namespace {
 
             for (BasicBlock *Succ: successors(OuterLoopHeader)) {
                 if (Succ != InnerLoop->getLoopPreheader() && 
-                    Succ != OuterLoop->getLoopLatch()) {
+                    Succ != OuterLoop->getLoopLatch() &&
+                    Succ != InnerLoop->getHeader()) {
                     return false;
                 }
             }
@@ -66,6 +67,9 @@ namespace {
                     }
                     if (isPerfectlyNested(*it1, *it2)) {
                         errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
+                    }
+                    if (isPerfectlyNested(*it2, *it1)) {
+                        errs() << "Loop " << i1 << " is perfectly nested by " << i2 << "\n";
                     }
                     i2++;
                 }
