@@ -111,15 +111,18 @@ namespace {
                                     }
                                 }
                             }
-                            for (BasicBlock *Pred : predecessors(tail)) {
-                                if(Pred == innerTail) {
-                                    isTailPerfect = true;
+                            for (BasicBlock *Succ : successors(innerHead)) {
+                                for(BasicBlock *SuccL2: successors(Succ)) {
+                                    if(SuccL2 == tail) {
+                                        isTailPerfect = true;
+                                    }
                                 }
                             }
                             if(isHeadPerfect && isTailPerfect) {
                                 errs() << "Loop " << loopTailMap.at(innerTail) << " is perfectly nested within loop " << loopCur.second << "\n";
                             }
                         }
+                        
                         for (BasicBlock *Pred: predecessors(current)) {
                             if(visited.count(Pred) == 0) {
                                 queue.push_back(Pred);
