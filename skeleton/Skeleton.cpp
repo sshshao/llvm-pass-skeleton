@@ -19,6 +19,33 @@ namespace {
         static char ID;
         SkeletonPass() : FunctionPass(ID) {}
 
+        bool isPerfectlyNested(BasicBlock *OuterHead, BasicBlock *OuterTail, 
+            BasicBlock *InnerHead, BasicBlock *InnerTail) {
+            BasicBlock *InnerPreHead = nullptr;
+            int innerPreHeadCtr = 0;
+
+            for (BasicBlock *Pred : predecessors(InnerHead)) {
+                innerPreHeadCtr++;
+                if(Pred != innerTail) {
+                    innerPreHead = Pred;
+                }
+            }
+
+            if (innerPreHeadCtr != 2)
+                return false;
+
+            for (BasicBlock *Succ : successors(OuterHead)) {
+                if (Succ != InnerHead && Succ != InnerPreHead && Succ != OuterTail)
+                    return false;
+            }
+            for (BasicBlock *Succ : successors(InnerTail)) {
+                if (Succ != OuterTail)
+                    return false;
+            }
+
+            return true;
+        }
+
         virtual bool runOnFunction(Function &F) {
             errs() << "Entering Function " << F.getName() + "\n";
 
@@ -46,35 +73,6 @@ namespace {
                         BasicBlock* head = Succ;
                         BasicBlock* tail = block.first;
 
-                        //BFS
-                        std::list<BasicBlock*> queue;
-                        std::unordered_set<BasicBlock*> visited;
-
-                        queue.push_back(tail);
-                        while (!queue.empty()) {
-                            BasicBlock *current = queue.front();
-
-                            inBBCnt++;
-                            for (BasicBlock::iterator BI = current->begin(); BI != current->end(); ++BI) {
-                                inInstCnt++;
-                            }
-
-                            if(current != head) {
-                                for (BasicBlock *Pred: predecessors(current)) {
-                                    if(visited.count(Pred) == 0) {
-                                        queue.push_back(Pred);
-                                    }
-                                }
-                            }
-
-                            visited.insert(current);
-                            queue.pop_front();
-                        }
-
-                        //errs() << "Loop " << loopCnt << ": BasicBlock " << block.second 
-                        //    << " goes back to Block " << map.at(Succ) << "\n";
-                        //errs() << "\t " << inBBCnt << " basic blocks; " << inInstCnt << " instructions\n";
-
                         loopHeadMap[loopCnt] = head;
                         loopTailMap[tail] = loopCnt;
                         loopCnt++;
@@ -83,8 +81,8 @@ namespace {
             }
 
             for (std::pair<BasicBlock*, int> loopCur : loopTailMap) {
-                BasicBlock *tail = loopCur.first;
                 BasicBlock *head = loopHeadMap.at(loopCur.second);
+                BasicBlock *tail = loopCur.first;
 
                 //BFS
                 std::list<BasicBlock*> queue;
@@ -99,26 +97,10 @@ namespace {
                             //Check is perfectly nested loop or not
                             errs() << "Loop " << loopTailMap.at(current) << " is nested within loop " << loopCur.second << "\n";
 
-                            bool isHeadPerfect = false;
-                            bool isTailPerfect = false;
                             BasicBlock *innerTail = current;
                             BasicBlock *innerHead = loopHeadMap.at(loopTailMap.at(innerTail));
 
-                            for (BasicBlock *Succ : successors(head)) {
-                                for(BasicBlock *SuccL2: successors(Succ)) {
-                                    if(SuccL2 == innerHead) {
-                                        isHeadPerfect = true;
-                                    }
-                                }
-                            }
-                            for (BasicBlock *Succ : successors(innerHead)) {
-                                for(BasicBlock *SuccL2: successors(Succ)) {
-                                    if(SuccL2 == tail) {
-                                        isTailPerfect = true;
-                                    }
-                                }
-                            }
-                            if(isHeadPerfect && isTailPerfect) {
+                            if(isPerfectlyNested(head, tail, innerHead, innerTail)) {
                                 errs() << "Loop " << loopTailMap.at(innerTail) << " is perfectly nested within loop " << loopCur.second << "\n";
                             }
                         }
