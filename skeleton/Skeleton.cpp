@@ -30,6 +30,21 @@ namespace {
             }
         }
 
+        bool isPerfectlyNested(Loop* OuterLoop, Loop* InnerLoop) {
+            BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
+            BasicBlock *OuterLoopLatch = OuterLoop->getLoopLatch();
+            BasicBlock *InnerLoopPreHeader = InnerLoop->getLoopPreheader();
+
+            for (BasicBlock *Succ: successors(OuterLoopHeader)) {
+                if (Succ != InnerLoop->getLoopPreheader() && 
+                    Succ != OuterLoop->getLoopLatch()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         virtual bool runOnFunction(Function &F) {
             errs() << "Entering Function " << F.getName() + "\n";
 
@@ -43,15 +58,11 @@ namespace {
 
             //Check each pair of loops and identify perfectly nested loops
             int i1 = 0;
-            for (std::list<int>::iterator it1 = loopsList.begin(); it1 != loopsList.end(); it1++) {
+            for (std::list<Loop*>::iterator it1 = loopsList.begin(); it1 != loopsList.end(); it1++) {
                 int i2 = 0;
-                for (std::list<int>::iterator it2 = loopsList.begin(); it2 != loopsList.end(); it2++) {
-                    if (*it1 == *it2)
-                        continue;
-                    if (LoopInterchangeLegality::tightlyNested(*it1, *it2)) {
+                for (std::list<Loop*>::iterator it2 = it1+1; it2 != loopsList.end(); it2++) {
+                    if (isPerfectlyNested(*it1, *it2)) {
                         errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
-                    } else if(LoopInterchangeLegality::tightlyNested(*it2, *it1)) {
-                        errs() << "Loop " << i1 << " is perfectly nested by " << i2 << "\n";
                     }
                     i2++;
                 }
