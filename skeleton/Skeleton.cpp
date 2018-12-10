@@ -68,12 +68,8 @@ namespace {
             //Check each pair of loops and identify perfectly nested loops
             int i1 = 0;
             for (std::list<Loop*>::iterator it1 = loopsList.begin(); it1 != loopsList.end(); it1++) {
-                int i2 = i1;
-                for (std::list<Loop*>::iterator it2 = it1; it2 != loopsList.end(); it2++) {
-                    if (it2 == it1 && it2 != loopsList.end()) {
-                        std::advance(it2, 1);
-                        i2++;
-                    }
+                int i2 = i1 + 1;
+                for (std::list<Loop*>::iterator it2 = std::next(it1, 1); it2 != loopsList.end(); it2++) {
                     errs() << "Checking " << i1 << " and " << i2 << "\n";
 
                     if (isPerfectlyNested(*it1, *it2)) {
