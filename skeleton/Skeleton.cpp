@@ -47,7 +47,6 @@ namespace {
                 if (Succ != InnerLoop->getLoopPreheader() && 
                     Succ != InnerLoop->getHeader() &&
                     Succ != getLoopEnd(OuterLoop)) {
-                    errs() << "Is not perfectly nested \n";
                     return false;
                 }
             }
@@ -71,7 +70,7 @@ namespace {
             for (std::list<Loop*>::iterator it1 = loopsList.begin(); it1 != loopsList.end(); it1++) {
                 int i2 = i1;
                 for (std::list<Loop*>::iterator it2 = it1; it2 != loopsList.end(); it2++) {
-                    if (it2 == it1) {
+                    if (it2 == it1 && it2 != loopsList.end()) {
                         std::advance(it2, 1);
                         i2++;
                     }
@@ -80,9 +79,6 @@ namespace {
                     if (isPerfectlyNested(*it1, *it2)) {
                         errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
                     }
-                    //if (isPerfectlyNested(*it2, *it1)) {
-                    //    errs() << "Loop " << i1 << " is perfectly nested by " << i2 << "\n";
-                    //}
                     i2++;
                 }
                 i1++;
