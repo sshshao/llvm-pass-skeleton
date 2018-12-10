@@ -31,16 +31,22 @@ namespace {
                 }
             }
 
+            errs() << innerPreHeadCtr << "\n";
+
             if (innerPreHeadCtr != 2)
                 return false;
 
             for (BasicBlock *Succ : successors(OuterHead)) {
-                if (Succ != InnerHead && Succ != InnerPreHead && Succ != OuterTail)
+                if (Succ != InnerHead && Succ != InnerPreHead && Succ != OuterTail) {
+                    errs() << "false 1 \n";
                     return false;
+                }
             }
             for (BasicBlock *Succ : successors(InnerTail)) {
-                if (Succ != OuterTail)
+                if (Succ != OuterTail) {
+                    errs() << "false 2 \n";
                     return false;
+                }
             }
 
             return true;
