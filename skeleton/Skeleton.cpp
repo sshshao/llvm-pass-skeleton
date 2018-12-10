@@ -26,8 +26,8 @@ namespace {
 
             for (BasicBlock *Pred : predecessors(InnerHead)) {
                 innerPreHeadCtr++;
-                if(Pred != innerTail) {
-                    innerPreHead = Pred;
+                if(Pred != InnerTail) {
+                    InnerPreHead = Pred;
                 }
             }
 
