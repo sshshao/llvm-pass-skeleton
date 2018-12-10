@@ -24,6 +24,7 @@ namespace {
 
         void handleLoop(Loop *L, std::list<Loop*> loopsList) {
             loopsList.push_back(L);
+            errs() << "Saved 1 loop \n";
 
             for (Loop *SL : L->getSubLoops()) {
                 handleLoop(SL, loopsList);
