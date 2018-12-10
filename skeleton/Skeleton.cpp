@@ -31,6 +31,8 @@ namespace {
         }
 
         bool isPerfectlyNested(Loop* OuterLoop, Loop* InnerLoop) {
+            errs() << "Checking nested relation \n";
+
             BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
             BasicBlock *OuterLoopLatch = OuterLoop->getLoopLatch();
             BasicBlock *InnerLoopPreHeader = InnerLoop->getLoopPreheader();
@@ -39,6 +41,7 @@ namespace {
                 if (Succ != InnerLoop->getLoopPreheader() && 
                     Succ != OuterLoop->getLoopLatch() &&
                     Succ != InnerLoop->getHeader()) {
+                    errs() << "Is not perfectly nested \n";
                     return false;
                 }
             }
@@ -60,8 +63,10 @@ namespace {
             //Check each pair of loops and identify perfectly nested loops
             int i1 = 0;
             for (std::list<Loop*>::iterator it1 = loopsList.begin(); it1 != loopsList.end(); it1++) {
+                errs() << "Checking " << i1 << "\n";
                 int i2 = 0;
                 for (std::list<Loop*>::iterator it2 = it1; it2 != loopsList.end(); it2++) {
+                    errs() << "Checking " << i1 << " and " << i2 << "\n";
                     if (it2 == it1) {
                         std::advance(it2, 1);
                     }
