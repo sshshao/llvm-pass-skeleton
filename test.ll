@@ -15,156 +15,135 @@ define i32 @main(i32, i8**) #0 {
   %10 = alloca i32, align 4
   %11 = alloca i32, align 4
   %12 = alloca i32, align 4
-  %13 = alloca i32, align 4
   store i32 0, i32* %3, align 4
   store i32 %0, i32* %4, align 4
   store i8** %1, i8*** %5, align 8
   store i32 0, i32* %6, align 4
-  br label %14
-
-; <label>:14:                                     ; preds = %48, %2
-  %15 = load i32, i32* %6, align 4
-  %16 = icmp slt i32 %15, 20
-  br i1 %16, label %17, label %51
-
-; <label>:17:                                     ; preds = %14
   store i32 0, i32* %7, align 4
-  br label %18
+  br label %13
 
-; <label>:18:                                     ; preds = %34, %17
-  %19 = load i32, i32* %7, align 4
-  %20 = icmp slt i32 %19, 15
-  br i1 %20, label %21, label %37
+; <label>:13:                                     ; preds = %27, %2
+  %14 = load i32, i32* %7, align 4
+  %15 = icmp slt i32 %14, 20
+  br i1 %15, label %16, label %30
 
-; <label>:21:                                     ; preds = %18
-  %22 = load i32, i32* %6, align 4
-  %23 = add nsw i32 %22, 1
-  store i32 %23, i32* %6, align 4
+; <label>:16:                                     ; preds = %13
   store i32 0, i32* %8, align 4
-  br label %24
+  br label %17
 
-; <label>:24:                                     ; preds = %30, %21
-  %25 = load i32, i32* %8, align 4
-  %26 = icmp slt i32 %25, 15
-  br i1 %26, label %27, label %33
+; <label>:17:                                     ; preds = %23, %16
+  %18 = load i32, i32* %8, align 4
+  %19 = icmp slt i32 %18, 15
+  br i1 %19, label %20, label %26
 
-; <label>:27:                                     ; preds = %24
-  %28 = load i32, i32* %6, align 4
-  %29 = add nsw i32 %28, 2
-  store i32 %29, i32* %6, align 4
-  br label %30
+; <label>:20:                                     ; preds = %17
+  %21 = load i32, i32* %6, align 4
+  %22 = add nsw i32 %21, 1
+  store i32 %22, i32* %6, align 4
+  br label %23
 
-; <label>:30:                                     ; preds = %27
-  %31 = load i32, i32* %8, align 4
-  %32 = add nsw i32 %31, 1
-  store i32 %32, i32* %8, align 4
-  br label %24
+; <label>:23:                                     ; preds = %20
+  %24 = load i32, i32* %8, align 4
+  %25 = add nsw i32 %24, 1
+  store i32 %25, i32* %8, align 4
+  br label %17
 
-; <label>:33:                                     ; preds = %24
-  br label %34
+; <label>:26:                                     ; preds = %17
+  br label %27
 
-; <label>:34:                                     ; preds = %33
-  %35 = load i32, i32* %7, align 4
-  %36 = add nsw i32 %35, 1
-  store i32 %36, i32* %7, align 4
-  br label %18
+; <label>:27:                                     ; preds = %26
+  %28 = load i32, i32* %7, align 4
+  %29 = mul nsw i32 %28, 2
+  store i32 %29, i32* %7, align 4
+  br label %13
 
-; <label>:37:                                     ; preds = %18
+; <label>:30:                                     ; preds = %13
+  store i32 0, i32* %6, align 4
   store i32 0, i32* %9, align 4
-  br label %38
+  br label %31
 
-; <label>:38:                                     ; preds = %44, %37
-  %39 = load i32, i32* %9, align 4
-  %40 = icmp slt i32 %39, 15
-  br i1 %40, label %41, label %47
+; <label>:31:                                     ; preds = %46, %30
+  %32 = load i32, i32* %9, align 4
+  %33 = icmp slt i32 %32, 10
+  br i1 %33, label %34, label %49
 
-; <label>:41:                                     ; preds = %38
-  %42 = load i32, i32* %6, align 4
-  %43 = add nsw i32 %42, 2
-  store i32 %43, i32* %6, align 4
-  br label %44
+; <label>:34:                                     ; preds = %31
+  store i32 0, i32* %10, align 4
+  br label %35
 
-; <label>:44:                                     ; preds = %41
-  %45 = load i32, i32* %9, align 4
-  %46 = add nsw i32 %45, 1
-  store i32 %46, i32* %9, align 4
-  br label %38
+; <label>:35:                                     ; preds = %42, %34
+  %36 = load i32, i32* %10, align 4
+  %37 = load i32, i32* %9, align 4
+  %38 = icmp slt i32 %36, %37
+  br i1 %38, label %39, label %45
 
-; <label>:47:                                     ; preds = %38
-  br label %48
+; <label>:39:                                     ; preds = %35
+  %40 = load i32, i32* %6, align 4
+  %41 = add nsw i32 %40, -1
+  store i32 %41, i32* %6, align 4
+  br label %42
 
-; <label>:48:                                     ; preds = %47
-  %49 = load i32, i32* %6, align 4
-  %50 = mul nsw i32 %49, 2
-  store i32 %50, i32* %6, align 4
-  br label %14
+; <label>:42:                                     ; preds = %39
+  %43 = load i32, i32* %10, align 4
+  %44 = add nsw i32 %43, 1
+  store i32 %44, i32* %10, align 4
+  br label %35
 
-; <label>:51:                                     ; preds = %14
+; <label>:45:                                     ; preds = %35
+  br label %46
+
+; <label>:46:                                     ; preds = %45
+  %47 = load i32, i32* %9, align 4
+  %48 = add nsw i32 %47, 1
+  store i32 %48, i32* %9, align 4
+  br label %31
+
+; <label>:49:                                     ; preds = %31
+  store i32 0, i32* %6, align 4
   store i32 0, i32* %11, align 4
-  br label %52
+  br label %50
 
-; <label>:52:                                     ; preds = %57, %51
-  %53 = load i32, i32* %11, align 4
-  %54 = icmp slt i32 %53, 50
-  br i1 %54, label %55, label %60
+; <label>:50:                                     ; preds = %66, %49
+  %51 = load i32, i32* %11, align 4
+  %52 = icmp slt i32 %51, 20
+  br i1 %52, label %53, label %69
 
-; <label>:55:                                     ; preds = %52
-  %56 = load i32, i32* %11, align 4
-  store i32 %56, i32* %10, align 4
-  br label %57
-
-; <label>:57:                                     ; preds = %55
-  %58 = load i32, i32* %11, align 4
-  %59 = add nsw i32 %58, 1
-  store i32 %59, i32* %11, align 4
-  br label %52
-
-; <label>:60:                                     ; preds = %52
+; <label>:53:                                     ; preds = %50
+  %54 = load i32, i32* %6, align 4
+  %55 = mul nsw i32 %54, 2
+  store i32 %55, i32* %6, align 4
   store i32 0, i32* %12, align 4
-  br label %61
+  br label %56
 
-; <label>:61:                                     ; preds = %78, %60
-  %62 = load i32, i32* %12, align 4
-  %63 = icmp slt i32 %62, 40
-  br i1 %63, label %64, label %81
+; <label>:56:                                     ; preds = %62, %53
+  %57 = load i32, i32* %12, align 4
+  %58 = icmp slt i32 %57, 5
+  br i1 %58, label %59, label %65
 
-; <label>:64:                                     ; preds = %61
-  %65 = load i32, i32* %12, align 4
-  %66 = load i32, i32* %10, align 4
-  %67 = sub nsw i32 %66, %65
-  store i32 %67, i32* %10, align 4
-  store i32 0, i32* %13, align 4
-  br label %68
+; <label>:59:                                     ; preds = %56
+  %60 = load i32, i32* %6, align 4
+  %61 = add nsw i32 %60, 1
+  store i32 %61, i32* %6, align 4
+  br label %62
 
-; <label>:68:                                     ; preds = %74, %64
-  %69 = load i32, i32* %13, align 4
-  %70 = icmp slt i32 %69, 5
-  br i1 %70, label %71, label %77
+; <label>:62:                                     ; preds = %59
+  %63 = load i32, i32* %12, align 4
+  %64 = add nsw i32 %63, 1
+  store i32 %64, i32* %12, align 4
+  br label %56
 
-; <label>:71:                                     ; preds = %68
-  %72 = load i32, i32* %10, align 4
-  %73 = add nsw i32 %72, 2
-  store i32 %73, i32* %10, align 4
-  br label %74
+; <label>:65:                                     ; preds = %56
+  br label %66
 
-; <label>:74:                                     ; preds = %71
-  %75 = load i32, i32* %13, align 4
-  %76 = add nsw i32 %75, 1
-  store i32 %76, i32* %13, align 4
-  br label %68
+; <label>:66:                                     ; preds = %65
+  %67 = load i32, i32* %11, align 4
+  %68 = add nsw i32 %67, 1
+  store i32 %68, i32* %11, align 4
+  br label %50
 
-; <label>:77:                                     ; preds = %68
-  br label %78
-
-; <label>:78:                                     ; preds = %77
-  %79 = load i32, i32* %12, align 4
-  %80 = add nsw i32 %79, 1
-  store i32 %80, i32* %12, align 4
-  br label %61
-
-; <label>:81:                                     ; preds = %61
-  %82 = load i32, i32* %3, align 4
-  ret i32 %82
+; <label>:69:                                     ; preds = %50
+  %70 = load i32, i32* %3, align 4
+  ret i32 %70
 }
 
 attributes #0 = { noinline nounwind uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
