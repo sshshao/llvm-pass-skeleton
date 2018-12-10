@@ -1,3 +1,5 @@
+int timesTwo(int num);
+
 int main(int argc, char **argv) {
     int a = 0;
     for (int i = 0 ; i < 20 ; i *= 2) {
@@ -15,9 +17,22 @@ int main(int argc, char **argv) {
 
     a = 0;
     for(int i = 0; i < 20; i++) {
-        a *= 2;
+        timesTwo(a);
         for(int j = 0; j < 5; j++) {
             a++;
         }
     }
+
+    a = 0;
+    for(int i = 0; i < 20; i++) {
+        for(int j = 0; j < 5; j++) {
+            a++;
+        }
+        timesTwo(a);
+    }
+}
+
+int timesTwo(int num) {
+    num = num * 2;
+    return num;
 }
