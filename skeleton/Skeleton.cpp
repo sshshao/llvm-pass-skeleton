@@ -60,7 +60,10 @@ namespace {
             int i1 = 0;
             for (std::list<Loop*>::iterator it1 = loopsList.begin(); it1 != loopsList.end(); it1++) {
                 int i2 = 0;
-                for (std::list<Loop*>::iterator it2 = it1+1; it2 != loopsList.end(); it2++) {
+                for (std::list<Loop*>::iterator it2 = it1; it2 != loopsList.end(); it2++) {
+                    if (it2 == it1) {
+                        std::advance(it2, 1);
+                    }
                     if (isPerfectlyNested(*it1, *it2)) {
                         errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
                     }
