@@ -97,7 +97,7 @@ namespace {
                     if(current != head) {
                         if(current != tail && loopTailMap.count(current) == 1) {
                             //Check is perfectly nested loop or not
-                            //errs() << "Loop " << loopTailMap.at(current) << " is nested within loop " << loopCur.second << "\n";
+                            errs() << "Loop " << loopTailMap.at(current) << " is nested within loop " << loopCur.second << "\n";
 
                             bool isHeadPerfect = false;
                             bool isTailPerfect = false;
