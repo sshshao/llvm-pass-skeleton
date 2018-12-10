@@ -8,9 +8,10 @@
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
-#include "llvm/Analysis/LoopInfo.h"
-#include "llvm/IR/Dominators.h"
-#include "llvm/ADT/APFloat.h"
+#include <llvm/Analysis/LoopInfo.h>
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/CFG.h"
 
 using namespace llvm;
 
@@ -19,47 +20,40 @@ namespace {
         static char ID;
         SkeletonPass() : FunctionPass(ID) {}
 
-        bool isPerfectlyNested(BasicBlock *OuterHead, BasicBlock *OuterTail, 
-            BasicBlock *InnerHead, BasicBlock *InnerTail) {
-            BasicBlock *InnerPreHead = nullptr;
-            int innerPreHeadCtr = 0;
+        void getAnalysisUsage(AnalysisUsage &AU) const override {
+            AU.setPreservesCFG();
+            AU.addRequired<LoopInfoWrapperPass>();
+        }
 
-            for (BasicBlock *Pred : predecessors(InnerHead)) {
-                innerPreHeadCtr++;
-                if(Pred != InnerTail) {
-                    InnerPreHead = Pred;
+        void handleLoop(Loop *L, std::list<Loop*> *loopsList) {
+            loopsList->push_back(L);
+
+            for (Loop *SL : L->getSubLoops()) {
+                handleLoop(SL, loopsList);
+            }
+        }
+
+        BasicBlock* getLoopEnd(Loop *Loop) {
+            for (BasicBlock *Succ : successors(Loop->getHeader())) {
+                if(!Loop->contains(Succ)) {
+                    return Succ;
                 }
             }
 
-            errs() << innerPreHeadCtr << "\n";
+            return nullptr;
+        }
 
-            if (innerPreHeadCtr != 2)
+        bool isPerfectlyNested(Loop* OuterLoop, Loop* InnerLoop) {
+            BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
+            BranchInst *OuterLoopHeaderBI = dyn_cast<BranchInst>(OuterLoopHeader->getTerminator());
+            if (!OuterLoopHeaderBI)
                 return false;
-
-            int loopCnt = 0;
-            for (BasicBlock *Succ : successors(OuterHead)) {
-                loopCnt++;
-                if (Succ != InnerHead) {
-                    errs() << "Checkpoint 1\n";
-                }
-                if (Succ != InnerPreHead) {
-                    errs() << "Checkpoint 2\n";
-                }
-                if (Succ != OuterTail) {
-                    errs() << "Checkpoint 3\n";
-                }
-                if (Succ != InnerHead && Succ != InnerPreHead && Succ != OuterTail) {
-                    errs() << "false 1 \n";
-                    //return false;
-                }
-            }
             
-            errs() << "LoopCnt: " << loopCnt << "\n"; 
-            return false;
-
-            for (BasicBlock *Succ : successors(InnerTail)) {
-                if (Succ != OuterTail) {
-                    errs() << "false 2 \n";
+            for (BasicBlock *Succ : successors(OuterLoopHeaderBI)) {
+                if (Succ != InnerLoop->getLoopPreheader() && 
+                    Succ != InnerLoop->getHeader() &&
+                    Succ != getLoopEnd(OuterLoop)) {
+                    errs() << "Is not perfectly nested \n";
                     return false;
                 }
             }
@@ -70,74 +64,36 @@ namespace {
         virtual bool runOnFunction(Function &F) {
             errs() << "Entering Function " << F.getName() + "\n";
 
-            int bbCnt = 0;
-            int loopCnt = 0;
-            std::unordered_map<BasicBlock*, int> map;
-            auto* dTree = new DominatorTree(F);
-            DomTreeNodeBase<BasicBlock> *root = dTree->getRootNode();
+            std::list<Loop*> loopsList;
 
-            for (Function::iterator I = F.begin(); I != F.end(); ++I) {
-                BasicBlock *BB = &(*I);
-                map[BB] = bbCnt;
-                bbCnt++;
+            //Get all loops
+            LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
+            for (LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
+                handleLoop(*i, &loopsList);
             }
 
-            std::unordered_map<int, BasicBlock*> loopHeadMap;
-            std::unordered_map<BasicBlock*, int> loopTailMap;
-            for (std::pair<BasicBlock*, int> block : map) {
-                for (BasicBlock *Succ : successors(block.first)) {
-                    //Check if successor dominants block
-                    if (dTree->properlyDominates(Succ, block.first)) {
-                        //Count enclosing basicblocks and instructions
-                        int inBBCnt = 1;
-                        int inInstCnt = 0;
-                        BasicBlock* head = Succ;
-                        BasicBlock* tail = block.first;
-
-                        loopHeadMap[loopCnt] = head;
-                        loopTailMap[tail] = loopCnt;
-                        loopCnt++;
+            //Check each pair of loops and identify perfectly nested loops
+            int i1 = 0;
+            for (std::list<Loop*>::iterator it1 = loopsList.begin(); it1 != loopsList.end(); it1++) {
+                int i2 = i1;
+                for (std::list<Loop*>::iterator it2 = it1; it2 != loopsList.end(); it2++) {
+                    if (it2 == it1) {
+                        std::advance(it2, 1);
+                        i2++;
                     }
-                }
-            }
+                    errs() << "Checking " << i1 << " and " << i2 << "\n";
 
-            for (std::pair<BasicBlock*, int> loopCur : loopTailMap) {
-                BasicBlock *head = loopHeadMap.at(loopCur.second);
-                BasicBlock *tail = loopCur.first;
-
-                //BFS
-                std::list<BasicBlock*> queue;
-                std::unordered_set<BasicBlock*> visited;
-
-                queue.push_back(tail);
-                visited.insert(tail);
-                while (!queue.empty()) {
-                    BasicBlock *current = queue.front();
-                    if(current != head) {
-                        if(current != tail && loopTailMap.count(current) == 1) {
-                            //Check is perfectly nested loop or not
-                            errs() << "Loop " << loopTailMap.at(current) << " is nested within loop " << loopCur.second << "\n";
-
-                            BasicBlock *innerTail = current;
-                            BasicBlock *innerHead = loopHeadMap.at(loopTailMap.at(innerTail));
-
-                            if(isPerfectlyNested(head, tail, innerHead, innerTail)) {
-                                errs() << "Loop " << loopTailMap.at(innerTail) << " is perfectly nested within loop " << loopCur.second << "\n";
-                            }
-                        }
-                        
-                        for (BasicBlock *Pred: predecessors(current)) {
-                            if(visited.count(Pred) == 0) {
-                                queue.push_back(Pred);
-                                visited.insert(current);
-                            }
-                        }
+                    if (isPerfectlyNested(*it1, *it2)) {
+                        errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
                     }
-                    queue.pop_front();
+                    //if (isPerfectlyNested(*it2, *it1)) {
+                    //    errs() << "Loop " << i1 << " is perfectly nested by " << i2 << "\n";
+                    //}
+                    i2++;
                 }
+                i1++;
             }
 
-            delete dTree;
             errs() << "Exiting Function " << F.getName() + "\n\n";
             return false;
         }
