@@ -1,4 +1,4 @@
-int timesTwo(int num);
+int timesTwo(int num, int iteration);
 
 int main(int argc, char **argv) {
     int a = 0;
@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 
     a = 0;
     for(int i = 0; i < 20; i++) {
-        timesTwo(a);
+        timesTwo(a, 50);
         for(int j = 0; j < 5; j++) {
             a++;
         }
@@ -28,11 +28,10 @@ int main(int argc, char **argv) {
         for(int j = 0; j < 5; j++) {
             a++;
         }
-        timesTwo(a);
+        timesTwo(a, 100);
     }
 }
 
-int timesTwo(int num) {
-    num = num * 2;
-    return num;
+int timesTwo(int num, int iteration) {
+    return timesTwo(num*2, iteration-1);
 }
