@@ -1,3 +1,5 @@
+#include <bits/stdc++.h>
+#include <list>
 #include "llvm/Pass.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Support/raw_ostream.h"
@@ -20,39 +22,43 @@ namespace {
             AU.addRequired<LoopInfoWrapperPass>();
         }
 
-        void handleLoop(Loop *L) {
-            errs() << "Iterated \n";
+        void handleLoop(Loop *L, std::list<oop*> loopsList) {
+            loopsList.push_back(L);
+
             for (Loop *SL : L->getSubLoops()) {
                 handleLoop(SL);
             }
         }
 
         virtual bool runOnFunction(Function &F) {
-            errs() << "Function " << F.getName () + "{\n";
+            errs() << "Entering Function " << F.getName() + "\n";
+
+            std::list<Loop*> loopsList;
+
+            //Get all loops
             LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
-            for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
-                handleLoop(*i);
+            for (LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
+                handleLoop(*i, loopsList);
             }
 
-            /*
-            for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
-                errs() << "Iterated \n";
-            }
-            errs() << "Function " << F.getName () + "{\n";
-            for(Function::iterator b = F.begin(), be = F.end(); b != be; ++b) {
-                for(LoopInfo::iterator L = LI.begin(), e = LI.end(); L!=e; ++L) {
-                    //if(L->contains(&*b)) {
-                    //    break; // Skip those BB that belong to a loop.
-                    //}       
-                }  
-                for(BasicBlock::iterator i = b->begin(), ie = b->end(); i != ie; i ++) {
-                    if(isa<CallInst>(&(*i)) || isa<InvokeInst>(&(*i))) {
-                        errs()<<"Call "<< cast<CallInst>(&(*i))->getCalledFunction()->getName() << "\n"; 
+            //Check each pair of loops and identify perfectly nested loops
+            int i1 = 0;
+            for (std::list<int>::iterator it1 = loopsList.begin(); it1 != loopsList.end(); it1++) {
+                int i2 = 0;
+                for (std::list<int>::iterator it2 = loopsList.begin(); it2 != loopsList.end(); it2++) {
+                    if (*it1 == *it2)
+                        continue;
+                    if (LoopInterchangeLegality::tightlyNested(*it1, *it2)) {
+                        errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
+                    } else if(LoopInterchangeLegality::tightlyNested(*it2, *it1)) {
+                        errs() << "Loop " << i1 << " is perfectly nested by " << i2 << "\n";
                     }
+                    i2++;
                 }
+                i1++;
             }
-            */
 
+            errs() << "Exiting Function " << F.getName() + "\n\n";
             return false;
         }
     };
