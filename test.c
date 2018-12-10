@@ -29,6 +29,9 @@ int main(int argc, char **argv) {
             a++;
         }
         timesTwo(a, 100);
+        for(int j = 0; j < 5; j++) {
+            a--;
+        }
     }
 }
 
