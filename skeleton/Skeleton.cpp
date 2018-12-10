@@ -36,7 +36,9 @@ namespace {
             if (innerPreHeadCtr != 2)
                 return false;
 
+            int loopCnt = 0;
             for (BasicBlock *Succ : successors(OuterHead)) {
+                loopCnt++;
                 if (Succ != InnerHead) {
                     errs() << "Checkpoint 1\n";
                 }
@@ -48,9 +50,13 @@ namespace {
                 }
                 if (Succ != InnerHead && Succ != InnerPreHead && Succ != OuterTail) {
                     errs() << "false 1 \n";
-                    return false;
+                    //return false;
                 }
             }
+            
+            errs() << "LoopCnt: " << loopCnt << "\n"; 
+            return false;
+
             for (BasicBlock *Succ : successors(InnerTail)) {
                 if (Succ != OuterTail) {
                     errs() << "false 2 \n";
