@@ -37,6 +37,15 @@ namespace {
                 return false;
 
             for (BasicBlock *Succ : successors(OuterHead)) {
+                if (Succ != InnerHead) {
+                    errs() << "Checkpoint 1\n";
+                }
+                if (Succ != InnerPreHead) {
+                    errs() << "Checkpoint 2\n";
+                }
+                if (Succ != OuterTail) {
+                    errs() << "Checkpoint 2\n";
+                }
                 if (Succ != InnerHead && Succ != InnerPreHead && Succ != OuterTail) {
                     errs() << "false 1 \n";
                     return false;
