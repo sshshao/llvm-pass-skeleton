@@ -19,122 +19,22 @@ namespace {
         static char ID;
         SkeletonPass() : FunctionPass(ID) {}
 
+        void handleLoop(Loop *L) {
+            errs() << "Iterated \n";
+            for (Loop *SL : L->getSubLoops()) {
+                handleLoop(SL);
+            }
+        }
+
         virtual bool runOnFunction(Function &F) {
-            errs() << "Entering Function " << F.getName() + "\n";
+            errs() << "Entering Function " << F.getName() + "\n\n";
 
-            int bbCnt = 0;
-            int loopCnt = 0;
-            std::unordered_map<BasicBlock*, int> map;
-            auto* dTree = new DominatorTree(F);
-            DomTreeNodeBase<BasicBlock> *root = dTree->getRootNode();
-
-            for (Function::iterator I = F.begin(); I != F.end(); ++I) {
-                BasicBlock *BB = &(*I);
-                map[BB] = bbCnt;
-                bbCnt++;
+            errs() << "Function " << F.getName () + "{\n";
+            LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
+            for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
+                handleLoop(*i);
             }
 
-            std::unordered_map<int, BasicBlock*> loopHeadMap;
-            std::unordered_map<BasicBlock*, int> loopTailMap;
-            for (std::pair<BasicBlock*, int> block : map) {
-                for (BasicBlock *Succ : successors(block.first)) {
-                    //Check if successor dominants block
-                    if (dTree->properlyDominates(Succ, block.first)) {
-                        //Count enclosing basicblocks and instructions
-                        int inBBCnt = 1;
-                        int inInstCnt = 0;
-                        BasicBlock* head = Succ;
-                        BasicBlock* tail = block.first;
-
-                        //BFS
-                        std::list<BasicBlock*> queue;
-                        std::unordered_set<BasicBlock*> visited;
-
-                        queue.push_back(tail);
-                        while (!queue.empty()) {
-                            BasicBlock *current = queue.front();
-
-                            inBBCnt++;
-                            for (BasicBlock::iterator BI = current->begin(); BI != current->end(); ++BI) {
-                                inInstCnt++;
-                            }
-
-                            if(current != head) {
-                                for (BasicBlock *Pred: predecessors(current)) {
-                                    if(visited.count(Pred) == 0) {
-                                        queue.push_back(Pred);
-                                    }
-                                }
-                            }
-
-                            visited.insert(current);
-                            queue.pop_front();
-                        }
-
-                        //errs() << "Loop " << loopCnt << ": BasicBlock " << block.second 
-                        //    << " goes back to Block " << map.at(Succ) << "\n";
-                        //errs() << "\t " << inBBCnt << " basic blocks; " << inInstCnt << " instructions\n";
-
-                        loopHeadMap[loopCnt] = head;
-                        loopTailMap[tail] = loopCnt;
-                        loopCnt++;
-                    }
-                }
-            }
-
-            for (std::pair<BasicBlock*, int> loopCur : loopTailMap) {
-                BasicBlock *tail = loopCur.first;
-                BasicBlock *head = loopHeadMap.at(loopCur.second);
-
-                //BFS
-                std::list<BasicBlock*> queue;
-                std::unordered_set<BasicBlock*> visited;
-
-                queue.push_back(tail);
-                visited.insert(tail);
-                while (!queue.empty()) {
-                    BasicBlock *current = queue.front();
-                    if(current != head) {
-                        if(current != tail && loopTailMap.count(current) == 1) {
-                            //Check is perfectly nested loop or not
-                            errs() << "Loop " << loopTailMap.at(current) << " is nested within loop " << loopCur.second << "\n";
-
-                            bool isHeadPerfect = false;
-                            bool isTailPerfect = false;
-                            BasicBlock *innerTail = current;
-                            BasicBlock *innerHead = loopHeadMap.at(loopTailMap.at(innerTail));
-
-                            for (BasicBlock *Succ : successors(head)) {
-                                for(BasicBlock *SuccL2: successors(Succ)) {
-                                    if(SuccL2 == innerHead) {
-                                        isHeadPerfect = true;
-                                    }
-                                }
-                            }
-                            for (BasicBlock *Succ : successors(innerHead)) {
-                                for(BasicBlock *SuccL2: successors(Succ)) {
-                                    if(SuccL2 == tail) {
-                                        isTailPerfect = true;
-                                    }
-                                }
-                            }
-                            if(isHeadPerfect && isTailPerfect) {
-                                errs() << "Loop " << loopTailMap.at(innerTail) << " is perfectly nested within loop " << loopCur.second << "\n";
-                            }
-                        }
-                        
-                        for (BasicBlock *Pred: predecessors(current)) {
-                            if(visited.count(Pred) == 0) {
-                                queue.push_back(Pred);
-                                visited.insert(current);
-                            }
-                        }
-                    }
-                    queue.pop_front();
-                }
-            }
-
-            delete dTree;
             errs() << "Exiting Function " << F.getName() + "\n\n";
             return false;
         }
