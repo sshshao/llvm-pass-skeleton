@@ -22,11 +22,11 @@ namespace {
             AU.addRequired<LoopInfoWrapperPass>();
         }
 
-        void handleLoop(Loop *L, std::list<oop*> loopsList) {
+        void handleLoop(Loop *L, std::list<Loop*> loopsList) {
             loopsList.push_back(L);
 
             for (Loop *SL : L->getSubLoops()) {
-                handleLoop(SL);
+                handleLoop(SL, loopsList);
             }
         }
 
