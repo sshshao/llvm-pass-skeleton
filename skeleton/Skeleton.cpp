@@ -1,5 +1,3 @@
-#include <bits/stdc++.h>
-#include <list>
 #include "llvm/Pass.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Support/raw_ostream.h"
@@ -8,9 +6,7 @@
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
-#include "llvm/Analysis/LoopInfo.h"
-#include "llvm/IR/Dominators.h"
-#include "llvm/ADT/APFloat.h"
+#include <llvm/Analysis/LoopInfo.h>
 
 using namespace llvm;
 
@@ -18,6 +14,11 @@ namespace {
     struct SkeletonPass : public FunctionPass {
         static char ID;
         SkeletonPass() : FunctionPass(ID) {}
+
+        void getAnalysisUsage(AnalysisUsage &AU) const override {
+            AU.setPreservesCFG();
+            AU.addRequired<LoopInfoWrapperPass>();
+        }
 
         void handleLoop(Loop *L) {
             errs() << "Iterated \n";
@@ -27,15 +28,31 @@ namespace {
         }
 
         virtual bool runOnFunction(Function &F) {
-            errs() << "Entering Function " << F.getName() + "\n\n";
-
             errs() << "Function " << F.getName () + "{\n";
             LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
             for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
                 handleLoop(*i);
             }
 
-            errs() << "Exiting Function " << F.getName() + "\n\n";
+            /*
+            for(LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
+                errs() << "Iterated \n";
+            }
+            errs() << "Function " << F.getName () + "{\n";
+            for(Function::iterator b = F.begin(), be = F.end(); b != be; ++b) {
+                for(LoopInfo::iterator L = LI.begin(), e = LI.end(); L!=e; ++L) {
+                    //if(L->contains(&*b)) {
+                    //    break; // Skip those BB that belong to a loop.
+                    //}       
+                }  
+                for(BasicBlock::iterator i = b->begin(), ie = b->end(); i != ie; i ++) {
+                    if(isa<CallInst>(&(*i)) || isa<InvokeInst>(&(*i))) {
+                        errs()<<"Call "<< cast<CallInst>(&(*i))->getCalledFunction()->getName() << "\n"; 
+                    }
+                }
+            }
+            */
+
             return false;
         }
     };
