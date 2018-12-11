@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 
     for(int i = 0; i < 20; i++) {
         timesTwo(a, 50);
-        for(int j = i; j < 5; j++) {
+        for(int j = 0; j < 5; j++) {
             a++;
         }
     }
