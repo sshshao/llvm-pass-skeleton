@@ -65,6 +65,7 @@ namespace {
             return &*--I;
         }
 
+        /*
         bool isBasicBlockIndependent(BasicBlock *BB1, BasicBlock *BB2) {
             if (BB1 == nullptr || BB2 == nullptr)
                 return true;
@@ -101,34 +102,32 @@ namespace {
 
             return true;
         }
+        */
 
-        bool isNestedLoopIndependent(Loop* OuterLoop, Loop* InnerLoop) {
-            //BasicBlock *OuterLoopPreheader = OuterLoop->getLoopPreheader();
-            BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
-            BasicBlock *InnerLoopPreheader = InnerLoop->getLoopPreheader();
-            BasicBlock *InnerLoopHeader = InnerLoop->getHeader();
-
+        bool isNestedLoopIndependent(ScalarEvolution *SE, Loop* OuterLoop, Loop* InnerLoop) {
+            PHINode *OuterInductionPHI = getInductionVariable(OuterLoop, SE);
+            PHINode *InnerInductionPHI = getInductionVariable(InnerLoop, SE);
+            
+            Instruction *OuterIndexVar;
+            
+            if (OuterInductionPHI->getIncomingBlock(0) == OuterLoop->getLoopPreheader())
+                OuterIndexVar = dyn_cast<Instruction>(OuterInductionPHI->getIncomingValue(1));
+            else
+                OuterIndexVar = dyn_cast<Instruction>(OuterInductionPHI->getIncomingValue(0));
             /*
-            if (!isBasicBlockIndependent(OuterLoopPreheader, InnerLoopPreheader)) {
-                errs() << "dependent point 1 \n";
-            }
-            if (isBasicBlockIndependent(OuterLoopPreheader, InnerLoopHeader)) {
-                errs() << "dependent point 2 \n";
-            }
-            if (!isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader)) {
-                errs() << "dependent point 3 \n";
-            }
-            if (!isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader)) {
-                errs() << "dependent point 4 \n";
-            }
+            if (InnerInductionPHI->getIncomingBlock(0) == InnerLoop->getLoopPreheader())
+                InnerIndexVar = dyn_cast<Instruction>(InnerInductionPHI->getIncomingValue(1));
+            else
+                InnerIndexVar = dyn_cast<Instruction>(InnerInductionPHI->getIncomingValue(0));
             */
 
-            if (isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader) &&
-                isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader)) {
-                return true;
+            for (unsigned i = 0, e = InnerInductionPHI->getNumIncomingValues(); i != e; i++) {
+                if (OuterIndexVar == InnerInductionPHI->getIncomingValue(i)) {
+                    return false;
+                }
             }
 
-            return false;
+            return true;
         }
 
         virtual bool runOnFunction(Function &F) {
@@ -138,6 +137,8 @@ namespace {
 
             //Get all loops
             LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
+            ScalarEvolution *SE = &getAnalysis<ScalarEvolutionWrapperPass>().getSE();
+
             for (LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
                 handleLoop(*i, &loopsList);
             }
@@ -149,7 +150,7 @@ namespace {
                 for (std::list<Loop*>::iterator it2 = std::next(it1, 1); it2 != loopsList.end(); it2++) {
                     if (isPerfectlyNested(*it1, *it2)) {
                         //errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
-                        if(isNestedLoopIndependent(*it1, *it2)) {
+                        if(isNestedLoopIndependent(SE, *it1, *it2)) {
                             errs() << "Nested loop pair " << i1 << " and " << i2 << ": index variables are independent\n";
                         } else {
                             errs() << "Nested loop pair " << i1 << " and " << i2 << ": index variables are dependent\n";
