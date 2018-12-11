@@ -134,8 +134,6 @@ namespace {
                         } else {
                             errs() << "Nested loop pair " << i1 << " and " << i2 << ": index variables are dependent\n";
                         }
-                    } else {
-                        errs() << "Loop " << i2 << " is not perfectly nested by " << i1 << "\n";
                     }
                     i2++;
                 }
