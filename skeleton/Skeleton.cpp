@@ -94,7 +94,7 @@ namespace {
             return true;
         }
 
-        bool isNestedLoopIndependent(ScalarEvolution *SE, Loop* OuterLoop, Loop* InnerLoop) {
+        bool isNestedLoopIndependent(Loop* OuterLoop, Loop* InnerLoop) {
             BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
             BasicBlock *InnerLoopPreheader = InnerLoop->getLoopPreheader();
             BasicBlock *InnerLoopHeader = InnerLoop->getHeader();
@@ -131,7 +131,7 @@ namespace {
 
             //Get all loops
             LoopInfo &LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
-            ScalarEvolution *SE = &getAnalysis<ScalarEvolutionWrapperPass>().getSE();
+            //ScalarEvolution *SE = &getAnalysis<ScalarEvolutionWrapperPass>().getSE();
 
             for (LoopInfo::iterator i = LI.begin(), e = LI.end(); i!=e; ++i) {
                 handleLoop(*i, &loopsList);
@@ -144,7 +144,7 @@ namespace {
                 for (std::list<Loop*>::iterator it2 = std::next(it1, 1); it2 != loopsList.end(); it2++) {
                     if (isPerfectlyNested(*it1, *it2)) {
                         //errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
-                        if(isNestedLoopIndependent(SE, *it1, *it2)) {
+                        if(isNestedLoopIndependent(*it1, *it2)) {
                             errs() << "Nested loop pair " << i1 << " and " << i2 << ": index variables are independent\n";
                         } else {
                             errs() << "Nested loop pair " << i1 << " and " << i2 << ": index variables are dependent\n";
