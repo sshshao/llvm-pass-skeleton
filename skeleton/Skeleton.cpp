@@ -12,7 +12,6 @@
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include <llvm/Analysis/LoopInfo.h>
-#include "llvm/Analysis/ScalarEvolution.h"
 
 using namespace llvm;
 
@@ -73,9 +72,9 @@ namespace {
             
             for (BasicBlock::iterator it = BB1->begin(); it != BB1->end(); it++) {
                 for (User::op_iterator op_it = it->op_begin(); op_it != it->op_end(); op_it++) {
-                    if (isa<Argument>(*op_it)){
+                    if (isa<Argument>(*op_it)) {
                         BB1Vars.push_back(*op_it);
-                    } else if (((Instruction*)op_it)->getParent() != BB1){
+                    } else if (((Instruction*)op_it)->getParent() != BB1) {
                         BB1Vars.push_back(*op_it);
                     }
                 }
@@ -83,7 +82,7 @@ namespace {
 
             for (BasicBlock::iterator it = BB2->begin(); it != BB2->end(); it++) {
                 for (User::op_iterator op_it = it->op_begin(); op_it != it->op_end(); op_it++) {
-                    if (isa<Argument>(*op_it) || ((Instruction*)op_it)->getParent() != BB2){
+                    if (isa<Argument>(*op_it) || ((Instruction*)op_it)->getParent() != BB2) {
                         if(std::find(BB1Vars.begin(), BB1Vars.end(), *op_it) != BB1Vars.end()) {
                             return false;
                         } 
@@ -99,21 +98,6 @@ namespace {
             BasicBlock *InnerLoopPreheader = InnerLoop->getLoopPreheader();
             BasicBlock *InnerLoopHeader = InnerLoop->getHeader();
             BasicBlock *InnerLoopLatch = InnerLoop->getLoopLatch();
-
-            /*
-            if (!isBasicBlockIndependent(OuterLoopPreheader, InnerLoopPreheader)) {
-                errs() << "dependent point 1 \n";
-            }
-            if (isBasicBlockIndependent(OuterLoopPreheader, InnerLoopHeader)) {
-                errs() << "dependent point 2 \n";
-            }
-            if (!isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader)) {
-                errs() << "dependent point 3 \n";
-            }
-            if (!isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader)) {
-                errs() << "dependent point 4 \n";
-            }
-            */
 
             if (isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader) &&
                 isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader) &&
