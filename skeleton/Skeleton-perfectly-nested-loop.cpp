@@ -54,25 +54,6 @@ namespace {
             return true;
         }
 
-        bool isNestedLoopIndependent(Loop* OuterLoop, Loop* InnerLoop) {
-            auto *OuterLoopHeaderTerminator = dyn_cast<Inst>(OuterLoop->getHeader()->getTerminator());
-            auto *InnerLoopHeaderTerminator = dyn_cast<Inst>(InnerLoop->getHeader()->getTerminator());
-            BinaryOperator *OuterLoopHeaderInst = dyn_cast<BinaryOperator>(OuterLoopHeaderTerminator->getPrevNonDebugInstruction());
-            BinaryOperator *InnerLoopHeaderInst = dyn_cast<BinaryOperator>(InnerLoopHeaderTerminator->getPrevNonDebugInstruction());
-            
-            Value *OuterInstLhs = OuterLoopHeaderInst->getOperand(0);
-            Value *OuterInstRhs = OuterLoopHeaderInst->getOperand(1);
-            Value *InnerInstLhs = InnerLoopHeaderInst->getOperand(0);
-            Value *InnerInstRhs = InnerLoopHeaderInst->getOperand(1);
-
-            if(OuterInstLhs == InnerInstLhs || OuterInstLhs == InnerInstRhs ||
-                OuterInstRhs == InnerInstLhs || OuterInstRhs == InnerInstRhs) {
-                return false;
-            }
-
-            return true;
-        }
-
         virtual bool runOnFunction(Function &F) {
             errs() << "Entering Function " << F.getName() + "\n";
 
@@ -90,12 +71,7 @@ namespace {
                 int i2 = i1 + 1;
                 for (std::list<Loop*>::iterator it2 = std::next(it1, 1); it2 != loopsList.end(); it2++) {
                     if (isPerfectlyNested(*it1, *it2)) {
-                        //errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
-                        if(isNestedLoopIndependent(*it1, *it2)) {
-                            errs() << "Nested loop pair " << i1 << " and " << i2 << ": index variables are independent\n";
-                        } else {
-                            errs() << "Nested loop pair " << i1 << " and " << i2 << ": index variables are dependent\n";
-                        }
+                        errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
                     }
                     i2++;
                 }
