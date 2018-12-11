@@ -4,7 +4,7 @@ int main(int argc, char **argv) {
     int a = 0;
 
     for (int i = 0 ; i < 20 ; i *= 2) {
-        for (int j = 0; j < 15; j++) {
+        for (int j = i+1; j < 15; j++) {
             a++;
         }
     }
@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     }
 
     for(int i = 0; i < 20; i++) {
-        for(int j = i; j < 5; j++) {
+        for(int j = 0; j < 5; j++, i++) {
             a++;
         }
     }
