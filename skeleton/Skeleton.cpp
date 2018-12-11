@@ -107,6 +107,19 @@ namespace {
             BasicBlock *InnerLoopPreheader = InnerLoop->getLoopPreheader();
             BasicBlock *InnerLoopHeader = InnerLoop->getHeader();
 
+            if (!isBasicBlockIndependent(OuterLoopPreheader, InnerLoopPreheader)) {
+                errs() << "dependent point 1 \n";
+            }
+            if (isBasicBlockIndependent(OuterLoopPreheader, InnerLoopHeader)) {
+                errs() << "dependent point 2 \n";
+            }
+            if (!isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader)) {
+                errs() << "dependent point 3 \n";
+            }
+            if (!isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader)) {
+                errs() << "dependent point 4 \n";
+            }
+
             if (isBasicBlockIndependent(OuterLoopPreheader, InnerLoopPreheader) &&
                 isBasicBlockIndependent(OuterLoopPreheader, InnerLoopHeader) &&
                 isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader) &&
