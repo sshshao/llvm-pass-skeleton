@@ -55,11 +55,18 @@ namespace {
             return true;
         }
 
+        Instruction* getPrevInstruction(Instruction *Inst) {
+            BasicBlock::iterator I(Inst);
+            if (I == Inst->getParent()->begin())
+                return nullptr;
+            return &*--I;
+        }
+
         bool isNestedLoopIndependent(Loop* OuterLoop, Loop* InnerLoop) {
             auto *OuterLoopHeaderTerminator = dyn_cast<Instruction>(OuterLoop->getHeader()->getTerminator());
             auto *InnerLoopHeaderTerminator = dyn_cast<Instruction>(InnerLoop->getHeader()->getTerminator());
-            BinaryOperator *OuterLoopHeaderInst = dyn_cast<BinaryOperator>(OuterLoopHeaderTerminator->getPrevNonDebugInstruction());
-            BinaryOperator *InnerLoopHeaderInst = dyn_cast<BinaryOperator>(InnerLoopHeaderTerminator->getPrevNonDebugInstruction());
+            BinaryOperator *OuterLoopHeaderInst = dyn_cast<BinaryOperator>(getPrevInstruction(OuterLoopHeaderTerminator));
+            BinaryOperator *InnerLoopHeaderInst = dyn_cast<BinaryOperator>(getPrevInstruction(InnerLoopHeaderTerminator));
             
             Value *OuterInstLhs = OuterLoopHeaderInst->getOperand(0);
             Value *OuterInstRhs = OuterLoopHeaderInst->getOperand(1);
