@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 #include <list>
 #include "llvm/Pass.h"
+#include "llvm/IR/User.h"
+#include "llvm/IR/Value.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/LegacyPassManager.h"
@@ -62,23 +64,57 @@ namespace {
             return &*--I;
         }
 
-        bool isNestedLoopIndependent(Loop* OuterLoop, Loop* InnerLoop) {
-            auto *OuterLoopHeaderTerminator = dyn_cast<Instruction>(OuterLoop->getHeader()->getTerminator());
-            auto *InnerLoopHeaderTerminator = dyn_cast<Instruction>(InnerLoop->getHeader()->getTerminator());
-            BinaryOperator *OuterLoopHeaderInst = dyn_cast<BinaryOperator>(getPrevInstruction(OuterLoopHeaderTerminator));
-            BinaryOperator *InnerLoopHeaderInst = dyn_cast<BinaryOperator>(getPrevInstruction(InnerLoopHeaderTerminator));
+        bool isBasicBlockIndependent(BasicBlock *BB1, BasicBlock *BB2) {
+            if (BB1 == nullptr || BB2 == nullptr)
+                return true;
             
-            //Value *OuterInstLhs = OuterLoopHeaderInst->getOperand(0);
-            Value *OuterInstRhs = OuterLoopHeaderInst->getOperand(1);
-            //Value *InnerInstLhs = InnerLoopHeaderInst->getOperand(0);
-            Value *InnerInstRhs = InnerLoopHeaderInst->getOperand(1);
+            std::vector<Value*> BB1Vars;
+            std::vector<Value*> BB2Vars;
+            std::vector<Value*> Intersection;
+            
+            for (BasicBlock::iterator it = BB1->begin(); it != block->end(); it++) {
+                for (User::op_iterator op_it = it->op_begin(); op_it != it->op_end(); op_it++) {
+                    if (isa<Argument>(*op_it)){
+                        BB1Vars.push_back(*op_it);
+                    } else if (((Instruction*)op_it)->getParent() != BB1){
+                        BB1Vars.push_back(*op_it);
+                    }
+                }
+            }
 
-            //if(OuterInstLhs == InnerInstLhs || OuterInstLhs == InnerInstRhs ||
-            //    OuterInstRhs == InnerInstLhs || OuterInstRhs == InnerInstRhs) {
-            //    return false;
-            //}
+            for (BasicBlock::iterator it = BB2->begin(); it != block->end(); it++) {
+                for (User::op_iterator op_it = it->op_begin(); op_it != it->op_end(); op_it++) {
+                    if (isa<Argument>(*op_it)){
+                        BB2Vars.push_back(*op_it);
+                    } else if (((Instruction*)op_it)->getParent() != BB2){
+                        BB2Vars.push_back(*op_it);
+                    }
+                }
+            }
+
+            std::set_intersection(BB1Vars.begin(), BB1Vars.end(), 
+                BB2Vars.begin(), BB2Vars.end(), std::back_inserter(Intersection));
+            if (Intersection.size() > 0) {
+                return false;
+            }
 
             return true;
+        }
+
+        bool isNestedLoopIndependent(Loop* OuterLoop, Loop* InnerLoop) {
+            BasicBlock *OuterLoopPreheader = OuterLoop->getLoopPreheader();
+            BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
+            BasicBlock *InnerLoopPreheader = InnerLoop->getLoopPreheader();
+            BasicBlock *InnerLoopHeader = InnerLoop->getHeader();
+
+            if (isBasicBlockIndependent(OuterLoopPreheader, InnerLoopPreheader) &&
+                isBasicBlockIndependent(OuterLoopPreheader, InnerLoopHeader) &&
+                isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader) &&
+                isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader)) {
+                return true;
+            }
+
+            return false;
         }
 
         virtual bool runOnFunction(Function &F) {

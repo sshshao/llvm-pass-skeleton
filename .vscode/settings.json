@@ -20,6 +20,9 @@
         "typeinfo": "cpp",
         "algorithm": "cpp",
         "bitset": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "iosfwd": "cpp",
+        "__tree": "cpp",
+        "set": "cpp"
     }
 }
