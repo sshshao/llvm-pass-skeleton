@@ -12,6 +12,7 @@
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include <llvm/Analysis/LoopInfo.h>
+#include "llvm/Analysis/ScalarEvolution.h"
 
 using namespace llvm;
 
@@ -103,7 +104,7 @@ namespace {
 
         bool isNestedLoopIndependent(Loop* OuterLoop, Loop* InnerLoop) {
             BasicBlock *OuterLoopPreheader = OuterLoop->getLoopPreheader();
-            BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
+            //BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
             BasicBlock *InnerLoopPreheader = InnerLoop->getLoopPreheader();
             BasicBlock *InnerLoopHeader = InnerLoop->getHeader();
 
@@ -121,9 +122,7 @@ namespace {
             }
 
             if (isBasicBlockIndependent(OuterLoopPreheader, InnerLoopPreheader) &&
-                isBasicBlockIndependent(OuterLoopPreheader, InnerLoopHeader) &&
-                isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader) &&
-                isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader)) {
+                isBasicBlockIndependent(OuterLoopPreheader, InnerLoopHeader)) {
                 return true;
             }
 
