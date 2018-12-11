@@ -1,12 +1,13 @@
 #include <bits/stdc++.h>
 #include <list>
 #include "llvm/Pass.h"
+#include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Function.h"
-#include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/Support/raw_ostream.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
-#include "llvm/IR/IRBuilder.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include <llvm/Analysis/LoopInfo.h>
 
@@ -55,8 +56,8 @@ namespace {
         }
 
         bool isNestedLoopIndependent(Loop* OuterLoop, Loop* InnerLoop) {
-            auto *OuterLoopHeaderTerminator = dyn_cast<Inst>(OuterLoop->getHeader()->getTerminator());
-            auto *InnerLoopHeaderTerminator = dyn_cast<Inst>(InnerLoop->getHeader()->getTerminator());
+            auto *OuterLoopHeaderTerminator = dyn_cast<Instruction>(OuterLoop->getHeader()->getTerminator());
+            auto *InnerLoopHeaderTerminator = dyn_cast<Instruction>(InnerLoop->getHeader()->getTerminator());
             BinaryOperator *OuterLoopHeaderInst = dyn_cast<BinaryOperator>(OuterLoopHeaderTerminator->getPrevNonDebugInstruction());
             BinaryOperator *InnerLoopHeaderInst = dyn_cast<BinaryOperator>(InnerLoopHeaderTerminator->getPrevNonDebugInstruction());
             
