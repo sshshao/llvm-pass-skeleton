@@ -65,14 +65,11 @@ namespace {
             return &*--I;
         }
 
-        /*
         bool isBasicBlockIndependent(BasicBlock *BB1, BasicBlock *BB2) {
             if (BB1 == nullptr || BB2 == nullptr)
                 return true;
             
             std::vector<Value*> BB1Vars;
-            std::vector<Value*> BB2Vars;
-            std::vector<Value*> Intersection;
             
             for (BasicBlock::iterator it = BB1->begin(); it != BB1->end(); it++) {
                 for (User::op_iterator op_it = it->op_begin(); op_it != it->op_end(); op_it++) {
@@ -86,48 +83,45 @@ namespace {
 
             for (BasicBlock::iterator it = BB2->begin(); it != BB2->end(); it++) {
                 for (User::op_iterator op_it = it->op_begin(); op_it != it->op_end(); op_it++) {
-                    if (isa<Argument>(*op_it)){
-                        BB2Vars.push_back(*op_it);
-                    } else if (((Instruction*)op_it)->getParent() != BB2){
-                        BB2Vars.push_back(*op_it);
+                    if (isa<Argument>(*op_it) || ((Instruction*)op_it)->getParent() != BB2){
+                        if(std::find(BB1Vars.begin(), BB1Vars.end(), *op_it) != BB1Vars.end()) {
+                            return false;
+                        } 
                     }
                 }
             }
 
-            std::set_intersection(BB1Vars.begin(), BB1Vars.end(), 
-                BB2Vars.begin(), BB2Vars.end(), std::back_inserter(Intersection));
-            if (Intersection.size() > 0) {
-                return false;
-            }
-
             return true;
         }
-        */
 
         bool isNestedLoopIndependent(ScalarEvolution *SE, Loop* OuterLoop, Loop* InnerLoop) {
-            PHINode *OuterInductionPHI = getInductionVariable(OuterLoop, SE);
-            PHINode *InnerInductionPHI = getInductionVariable(InnerLoop, SE);
-            
-            Instruction *OuterIndexVar;
-            
-            if (OuterInductionPHI->getIncomingBlock(0) == OuterLoop->getLoopPreheader())
-                OuterIndexVar = dyn_cast<Instruction>(OuterInductionPHI->getIncomingValue(1));
-            else
-                OuterIndexVar = dyn_cast<Instruction>(OuterInductionPHI->getIncomingValue(0));
+            BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
+            BasicBlock *InnerLoopPreheader = InnerLoop->getLoopPreheader();
+            BasicBlock *InnerLoopHeader = InnerLoop->getHeader();
+            BasicBlock *InnerLoopLatch = InnerLoop->getLoopLatch();
+
             /*
-            if (InnerInductionPHI->getIncomingBlock(0) == InnerLoop->getLoopPreheader())
-                InnerIndexVar = dyn_cast<Instruction>(InnerInductionPHI->getIncomingValue(1));
-            else
-                InnerIndexVar = dyn_cast<Instruction>(InnerInductionPHI->getIncomingValue(0));
+            if (!isBasicBlockIndependent(OuterLoopPreheader, InnerLoopPreheader)) {
+                errs() << "dependent point 1 \n";
+            }
+            if (isBasicBlockIndependent(OuterLoopPreheader, InnerLoopHeader)) {
+                errs() << "dependent point 2 \n";
+            }
+            if (!isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader)) {
+                errs() << "dependent point 3 \n";
+            }
+            if (!isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader)) {
+                errs() << "dependent point 4 \n";
+            }
             */
 
-            for (unsigned i = 0, e = InnerInductionPHI->getNumIncomingValues(); i != e; i++) {
-                if (OuterIndexVar == InnerInductionPHI->getIncomingValue(i)) {
-                    return false;
-                }
+            if (isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader) &&
+                isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader) &&
+                isBasicBlockIndependent(OuterLoopHeader, InnerLoopLatch)) {
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         virtual bool runOnFunction(Function &F) {
