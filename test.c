@@ -4,19 +4,19 @@ int main(int argc, char **argv) {
     int a = 0;
 
     for (int i = 0 ; i < 20 ; i *= 2) {
-        for (int j = i+1; j < 15; j++) {
+        for (int j = 0; j < 15; j++) {
             a++;
         }
     }
 
     for(int i = 0; i < 10; i++) {
-        for(int j = 0; j < i; j++) {
+        for(int j = 0; j < 20; j++) {
             a--;
         }
     }
 
     for(int i = 0; i < 20; i++) {
-        for(int j = 0; j < 5; j++, i++) {
+        for(int j = 0; j < 5; j++) {
             a++;
         }
     }
