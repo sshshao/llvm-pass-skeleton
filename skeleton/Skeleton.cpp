@@ -128,12 +128,14 @@ namespace {
                 int i2 = i1 + 1;
                 for (std::list<Loop*>::iterator it2 = std::next(it1, 1); it2 != loopsList.end(); it2++) {
                     if (isPerfectlyNested(*it1, *it2)) {
-                        //errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
+                        errs() << "Loop " << i2 << " is perfectly nested by " << i1 << "\n";
                         if(isNestedLoopIndependent(*it1, *it2)) {
                             errs() << "Nested loop pair " << i1 << " and " << i2 << ": index variables are independent\n";
                         } else {
                             errs() << "Nested loop pair " << i1 << " and " << i2 << ": index variables are dependent\n";
                         }
+                    } else {
+                        errs() << "Loop " << i2 << " is not perfectly nested by " << i1 << "\n";
                     }
                     i2++;
                 }

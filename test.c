@@ -10,13 +10,13 @@ int main(int argc, char **argv) {
     }
 
     for(int i = 0; i < 20; i++) {
-        for(int j = 0; j < 20; j++) {
+        for(int j = i; j < 20; j++) {
             a--;
         }
     }
 
     for(int i = 0; i < 20; i++) {
-        for(int j = 0; j < 5; j++) {
+        for(int j = 0; j < 5; j++, i++) {
             a++;
         }
     }
@@ -26,6 +26,15 @@ int main(int argc, char **argv) {
             a++;
         }
         timesTwo(a, 100);
+        for(int j = 0; j < 5; j++) {
+            a--;
+        }
+    }
+
+    for(int i = 0; i < 20; i++) {
+        if(a > 50) {
+            break;
+        }
         for(int j = 0; j < 5; j++) {
             a--;
         }
