@@ -103,11 +103,12 @@ namespace {
         }
 
         bool isNestedLoopIndependent(Loop* OuterLoop, Loop* InnerLoop) {
-            BasicBlock *OuterLoopPreheader = OuterLoop->getLoopPreheader();
-            //BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
+            //BasicBlock *OuterLoopPreheader = OuterLoop->getLoopPreheader();
+            BasicBlock *OuterLoopHeader = OuterLoop->getHeader();
             BasicBlock *InnerLoopPreheader = InnerLoop->getLoopPreheader();
             BasicBlock *InnerLoopHeader = InnerLoop->getHeader();
 
+            /*
             if (!isBasicBlockIndependent(OuterLoopPreheader, InnerLoopPreheader)) {
                 errs() << "dependent point 1 \n";
             }
@@ -120,9 +121,10 @@ namespace {
             if (!isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader)) {
                 errs() << "dependent point 4 \n";
             }
+            */
 
-            if (isBasicBlockIndependent(OuterLoopPreheader, InnerLoopPreheader) &&
-                isBasicBlockIndependent(OuterLoopPreheader, InnerLoopHeader)) {
+            if (isBasicBlockIndependent(OuterLoopHeader, InnerLoopPreheader) &&
+                isBasicBlockIndependent(OuterLoopHeader, InnerLoopHeader)) {
                 return true;
             }
 
