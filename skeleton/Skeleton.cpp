@@ -69,14 +69,14 @@ namespace {
             BinaryOperator *InnerLoopHeaderInst = dyn_cast<BinaryOperator>(getPrevInstruction(InnerLoopHeaderTerminator));
             
             Value *OuterInstLhs = OuterLoopHeaderInst->getOperand(0);
-            Value *OuterInstRhs = OuterLoopHeaderInst->getOperand(1);
+            //Value *OuterInstRhs = OuterLoopHeaderInst->getOperand(1);
             Value *InnerInstLhs = InnerLoopHeaderInst->getOperand(0);
-            Value *InnerInstRhs = InnerLoopHeaderInst->getOperand(1);
+            //Value *InnerInstRhs = InnerLoopHeaderInst->getOperand(1);
 
-            if(OuterInstLhs == InnerInstLhs || OuterInstLhs == InnerInstRhs ||
-                OuterInstRhs == InnerInstLhs || OuterInstRhs == InnerInstRhs) {
-                return false;
-            }
+            //if(OuterInstLhs == InnerInstLhs || OuterInstLhs == InnerInstRhs ||
+            //    OuterInstRhs == InnerInstLhs || OuterInstRhs == InnerInstRhs) {
+            //    return false;
+            //}
 
             return true;
         }
