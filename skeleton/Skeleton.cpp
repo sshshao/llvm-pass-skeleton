@@ -72,7 +72,7 @@ namespace {
             std::vector<Value*> BB2Vars;
             std::vector<Value*> Intersection;
             
-            for (BasicBlock::iterator it = BB1->begin(); it != block->end(); it++) {
+            for (BasicBlock::iterator it = BB1->begin(); it != BB1->end(); it++) {
                 for (User::op_iterator op_it = it->op_begin(); op_it != it->op_end(); op_it++) {
                     if (isa<Argument>(*op_it)){
                         BB1Vars.push_back(*op_it);
@@ -82,7 +82,7 @@ namespace {
                 }
             }
 
-            for (BasicBlock::iterator it = BB2->begin(); it != block->end(); it++) {
+            for (BasicBlock::iterator it = BB2->begin(); it != BB2->end(); it++) {
                 for (User::op_iterator op_it = it->op_begin(); op_it != it->op_end(); op_it++) {
                     if (isa<Argument>(*op_it)){
                         BB2Vars.push_back(*op_it);
